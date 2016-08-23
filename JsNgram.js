@@ -144,6 +144,24 @@ var JsNgram = new function(){
   this.makeResultHtml = makeResultHtml;
   
   /*############
+  Method: makeTextHilighted(text, at, hiLen, outLen)
+    generate html with text hilighted.
+  ############*/
+  
+  function makeTextHilighted(text, at, hiLen, outLen) {
+    var outLen = typeof outLen !== 'undefined' ? outLen : 100;
+    // ES6 can default value with 'outLen=100', but be conservative.
+    
+    var start = at - Math.floor((outLen - hiLen) / 2);
+    if(start < 0) { start = 0; }
+    var x = text.substr(start, outLen);
+    var pos = at - start;
+    var xx = [x.substr(0, pos), '<b>', x.substr(pos, hiLen), '</b>', x.substring(pos + hiLen, outLen)];
+    return(xx.join(''));
+  }
+  this.makeTextHilighted = makeTextHilighted;
+  
+  /*############
   Method: failMessageHandler(xhr, ajaxOptions, thrownError)
     handle the failure of ajax and show error message.
   ############*/
@@ -328,6 +346,24 @@ var JsNgram = new function(){
   this.generateDeferred = generateDeferred;
   
   /*############
+  Method: loadFullText(id)
+    load full text at id (url).
+  ############*/
+  
+  function loadFullText(id) {
+/**/
+  var cheat = {
+    '/a': "私たちは、もっとも始めに、この文書 a を追加してみます。",
+    '/b': '2つ目はもっともっとおもしろいよ、ね。'
+  };
+/**/
+    var text;
+    text = cheat[id];
+    return(text);
+  }
+  this.loadFullText = loadFullText;
+  
+  /*############
   Method: whenSearchRequestDone(useArgumentsToGetAllAsArray)
     integrate multiple ajax results of N-gram search.
   ############*/
@@ -364,9 +400,10 @@ var JsNgram = new function(){
           
           strVal = JSON.stringify(val);
           log.v1(val[0]);
-          var x = cheat[val[0]];
-          var xx = [x.substr(0, val[1]), '<b>', x.substr(val[1], work['nGram']), '</b>', x.substring(val[1] + work['nGram'], x.length)];
-          $('#result').append(JsNgram.makeResultHtml([work['what'], strVal, xx.join('')]));
+          var x = JsNgram.loadFullText(val[0]);
+          //var xx = [x.substr(0, val[1]), '<b>', x.substr(val[1], work['nGram']), '</b>', x.substring(val[1] + work['nGram'], x.length)];
+          var xx = JsNgram.makeTextHilighted(x, val[1], work['nGram']);
+          $('#result').append(JsNgram.makeResultHtml([work['what'], strVal, xx]));
         });
       });
       
@@ -376,20 +413,15 @@ var JsNgram = new function(){
       
       for(var k = 0; k < perfection.length; k++) {
         var val = perfection[k];
-        var x = cheat[val[0]];
-        var xx = [x.substr(0, val[1]), '<b>', x.substr(val[1], work['nWhat']), '</b>', x.substring(val[1] + work['nWhat'], x.length)];
-        JsNgram.resultSelector.append(JsNgram.makeResultHtml(['*', JSON.stringify(val), xx.join('')]));
+        var x = JsNgram.loadFullText(val[0]);
+        //var xx = [x.substr(0, val[1]), '<b>', x.substr(val[1], work['nWhat']), '</b>', x.substring(val[1] + work['nWhat'], x.length)];
+        var xx = JsNgram.makeTextHilighted(x, val[1], work['nWhat']);
+        JsNgram.resultSelector.append(JsNgram.makeResultHtml(['*', JSON.stringify(val), xx]));
       }
     
   }
   this.whenSearchRequestDone = whenSearchRequestDone;
   
-/**/
-  var cheat = {
-    '/a': "私たちは、もっとも始めに、この文書 a を追加してみます。",
-    '/b': '2つ目はもっともっとおもしろいよ、ね。'
-  };
-/**/
   /*############
   Method: appendSearchResult(what)
     perform search and show result.
