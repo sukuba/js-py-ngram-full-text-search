@@ -149,6 +149,8 @@ var JsNgram = new function(){
   ############*/
   
   function makeTextHilighted(text, at, hiLen, outLen) {
+    if(text == '') { return(''); }
+    
     var outLen = typeof outLen !== 'undefined' ? outLen : 100;
     // ES6 can default value with 'outLen=100', but be conservative.
     
@@ -226,6 +228,16 @@ var JsNgram = new function(){
   this.indexFileName = indexFileName;
   
   /*############
+  Method: fulltextFileName(id)
+    get json file name of full text body.
+  ############*/
+  
+  function fulltextFileName(id) {
+    return(this.textBase + id);
+  }
+  this.fulltextFileName = fulltextFileName;
+  
+  /*############
   Method: loadIndexFile(text)
     load index json file to find text.
   ############*/
@@ -234,6 +246,20 @@ var JsNgram = new function(){
     return($.ajax(this.indexFileName(text), this.ajaxJson).fail(this.failMessageHandler));
   }
   this.loadIndexFile = loadIndexFile;
+  
+  /*############
+  Method: loadFullText(docId, pos, hiLen, tag)
+    load full text at id (url) and show at result.
+  ############*/
+  
+  function loadFullText(docId, pos, hiLen, tag) {
+    return($.ajax(this.fulltextFileName(docId), this.ajaxText).always(function(result){
+      // success: result is string, fail: result is object
+      var x = (typeof result === 'object') ? '' : JsNgram.makeTextHilighted(result, pos, hiLen);
+      JsNgram.resultSelector.append(JsNgram.makeResultHtml([tag, docId, pos, x]));
+    }));
+  }
+  this.loadFullText = loadFullText;
   
   /*############
   Method: findPerfection(x, n)
@@ -346,24 +372,6 @@ var JsNgram = new function(){
   this.generateDeferred = generateDeferred;
   
   /*############
-  Method: loadFullText(id)
-    load full text at id (url).
-  ############*/
-  
-  function loadFullText(id) {
-/**/
-  var cheat = {
-    '/a': "私たちは、もっとも始めに、この文書 a を追加してみます。",
-    '/b': '2つ目はもっともっとおもしろいよ、ね。'
-  };
-/**/
-    var text;
-    text = cheat[id];
-    return(text);
-  }
-  this.loadFullText = loadFullText;
-  
-  /*############
   Method: showFound(found)
     show found.
   ############*/
@@ -379,9 +387,7 @@ var JsNgram = new function(){
         for(var k = 0; k < f3.length; k++) { // loop by position
           var pos = f3[k];
           var strVal = JSON.stringify([docId, pos]);
-          var x = this.loadFullText(docId);
-          var xx = this.makeTextHilighted(x, pos, this['work']['nGram']);
-          this.resultSelector.append(this.makeResultHtml([this['work']['what'], strVal, xx]));
+          this.loadFullText(docId, pos, this['work']['nGram'], this['work']['what']);
         }
       }
     }
@@ -401,9 +407,7 @@ var JsNgram = new function(){
       var val = perfection[k];
       var docId = val[0];
       var pos = val[1];
-      var x = this.loadFullText(docId);
-      var xx = this.makeTextHilighted(x, pos, this['work']['nWhat']);
-      this.resultSelector.append(this.makeResultHtml(['*', JSON.stringify(val), xx]));
+      this.loadFullText(docId, pos, this['work']['nWhat'], '*');
     }
   }
   this.showPerfection = showPerfection;
