@@ -364,61 +364,106 @@ var JsNgram = new function(){
   this.loadFullText = loadFullText;
   
   /*############
+  Method: showFound(found)
+    show found.
+  ############*/
+  
+  function showFound(found) {
+    var ids = Object.keys(found);
+    for(var i = 0; i < ids.length; i++) { // loop by document
+      var docId = ids[i];
+      var f2 = found[docId];
+      var seqs = Object.keys(f2);  // N-gram keys in the current document
+      for(var j = 0; j < seqs.length; j++) { // loop by key
+        var f3 = f2[j];
+        for(var k = 0; k < f3.length; k++) { // loop by position
+          var pos = f3[k];
+          var strVal = JSON.stringify([docId, pos]);
+          var x = this.loadFullText(docId);
+          var xx = this.makeTextHilighted(x, pos, this['work']['nGram']);
+          this.resultSelector.append(this.makeResultHtml([this['work']['what'], strVal, xx]));
+        }
+      }
+    }
+  }
+  this.showFound = showFound;
+  
+  /*############
+  Method: showPerfection(perfection)
+    show perfection.
+  ############*/
+  
+  function showPerfection(perfection) {
+    var n = perfection.length;
+    this.log.v1('perfection: ', n);
+    
+    for(var k = 0; k < n; k++) {
+      var val = perfection[k];
+      var docId = val[0];
+      var pos = val[1];
+      var x = this.loadFullText(docId);
+      var xx = this.makeTextHilighted(x, pos, this['work']['nWhat']);
+      this.resultSelector.append(this.makeResultHtml(['*', JSON.stringify(val), xx]));
+    }
+  }
+  this.showPerfection = showPerfection;
+  
+  /*############
+  Method: sortResultsByLocation(results)
+    rebuild results as location sorted.
+  ############*/
+  
+  function sortResultsByLocation(results) {
+    var log = JsNgram.log;
+    var found = {}; // gather results by location.
+    
+    $.each(results, function(j, result){
+      log.v2('j=', j, result);
+      if(result == undefined) {
+        log.v0('result is undefined. means ajax success with empty result.');
+        return(true);
+      }
+      // result is [data, status_text, jqXHR_object]
+      $.each(result[0], function(i, val){
+        log.v2('i=', i, val);
+        
+        var docId = val[0];
+        var pos = val[1];
+        
+        if(!(docId in found)) {
+          found[docId] = {};
+        }
+        if(!(j in found[docId])) {
+          found[docId][j] = [];
+        }
+        
+        found[docId][j].push(pos);
+      });
+    });
+    return(found);
+  }
+  this.sortResultsByLocation = sortResultsByLocation;
+  
+  /*############
   Method: whenSearchRequestDone(useArgumentsToGetAllAsArray)
     integrate multiple ajax results of N-gram search.
   ############*/
   
   function whenSearchRequestDone(useArgumentsToGetAllAsArray) {
-      var results = arguments;
-      var work = JsNgram['work'];
-      var log = JsNgram.log;
-      
-      if(work['deferred'].length == 1) { // adjust nesting level
-        results = [results];
-      }
-      log.v1('whole: ', results.length, results);
-      found = {}; // gather results by location.
-      $.each(results, function(j, result){
-        log.v1('j=', j, result);
-        if(result == undefined) {
-          log.v0('result is undefined. means ajax success with empty result.');
-          return(true);
-        }
-        // result is [data, status_text, jqXHR_object]
-        $.each(result[0], function(i, val){
-          log.v1('i=', i, val);
-          
-          var docId = val[0];
-          var pos = val[1];
-          if(!(docId in found)) {
-            found[docId] = {};
-          }
-          if(!(j in found[docId])) {
-            found[docId][j] = [];
-          }
-          found[docId][j].push(pos);
-          
-          strVal = JSON.stringify(val);
-          log.v1(val[0]);
-          var x = JsNgram.loadFullText(val[0]);
-          //var xx = [x.substr(0, val[1]), '<b>', x.substr(val[1], work['nGram']), '</b>', x.substring(val[1] + work['nGram'], x.length)];
-          var xx = JsNgram.makeTextHilighted(x, val[1], work['nGram']);
-          $('#result').append(JsNgram.makeResultHtml([work['what'], strVal, xx]));
-        });
-      });
-      
-      log.v1(JSON.stringify(found));
-      var perfection = JsNgram.findPerfection(found, work['nText']);
-      log.v1(JSON.stringify(perfection));
-      
-      for(var k = 0; k < perfection.length; k++) {
-        var val = perfection[k];
-        var x = JsNgram.loadFullText(val[0]);
-        //var xx = [x.substr(0, val[1]), '<b>', x.substr(val[1], work['nWhat']), '</b>', x.substring(val[1] + work['nWhat'], x.length)];
-        var xx = JsNgram.makeTextHilighted(x, val[1], work['nWhat']);
-        JsNgram.resultSelector.append(JsNgram.makeResultHtml(['*', JSON.stringify(val), xx]));
-      }
+    var log = JsNgram.log;
+    var work = JsNgram['work'];
     
+    // adjust nesting level when length equals 1.
+    var results = (work['deferred'].length > 1) ? arguments : [arguments];
+    log.v1('whole: ', results.length, results);
+    
+    var found = JsNgram.sortResultsByLocation(results);
+    log.v1(JSON.stringify(found));
+    JsNgram.showFound(found);
+    
+    var perfection = JsNgram.findPerfection(found, work['nText']);
+    log.v1(JSON.stringify(perfection));
+    JsNgram.showPerfection(perfection);
   }
   this.whenSearchRequestDone = whenSearchRequestDone;
   
