@@ -80,7 +80,7 @@ class JsNgramReader(object):
 
 
 def test():
-    ix = JsNgram(src=r'E:\bin\GRA-dev\scratch\txt')
+    ix = JsNgram(src=r'E:\scratch\txt')
     #ix.add_document(u'/a', u"私たちは、もっとも始めに、この文書 a を追加してみます。")
     #ix.add_document(u'/b', u'2つ目はもっともっとおもしろいよ、ね。')
     ix.add_file('a.txt')
