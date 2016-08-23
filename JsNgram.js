@@ -70,8 +70,8 @@ var JsNgram = new function(){
   ############*/
   
   function Log(verbose){
-    function nop(msg){}
-    function log(msg){ console.log(msg); }
+    function nop(){}
+    function log(msg){ console.log.apply(null, arguments); }
     this.v0 = log;
     this.v1 = (verbose < 1) ? nop : log;
     this.v2 = (verbose < 2) ? nop : log;
@@ -261,6 +261,129 @@ var JsNgram = new function(){
   }
   this.findPerfection = findPerfection;
   
+  /*############
+  Method: startWork(what)
+    start up with the property work.
+  ############*/
+  
+  function startWork(what) {
+    //clearWork();
+    var work = {};
+    work['what'] = what;
+    work['nWhat'] = what.length;
+    work['nGram'] = this.size;
+    work['nIter'] = work['nWhat'] - work['nGram'] + 1;
+    work['texts'] = this.generateTexts(work);
+    work['nText'] = work['texts'].length;
+    work['deferred'] = this.generateDeferred(work);
+    // the last one submits multiple ajax requests.
+    return(work);
+  }
+  this.startWork = startWork;
+  
+  /*############
+  Method: clearWork()
+    clear the property work.
+  ############*/
+  
+  function clearWork() {
+    this.work = {};
+  }
+  this.clearWork = clearWork;
+  
+  /*############
+  Method: generateTexts(work)
+    generate N-gram splitted keyword texts as array.
+  ############*/
+  
+  function generateTexts(work) {
+    var texts = [];
+    // single character (or shoter than N-gram size) text
+    // will not go into this loop.
+    for(var i = 0; i < work['nIter']; i++) {
+      texts.push(work['what'].substr(i, work['nGram']));
+    }
+    
+    // for a short word
+    if(work['nWhat'] < work['nGram']) {
+      texts.push(work['what']);
+      this.log.v1('adjusted: ', texts);
+    }
+    return(texts);
+  }
+  this.generateTexts = generateTexts;
+  
+  /*############
+  Method: generateDeferred(work)
+    generate ajax request array for each N-gram keyword after submit.
+  ############*/
+  
+  function generateDeferred(work) {
+    var deferred = [];
+    for(var i = 0; i < work['nText']; i++) {
+      deferred.push(this.loadIndexFile(work['texts'][i]));
+    }
+    return(deferred);
+  }
+  this.generateDeferred = generateDeferred;
+  
+  /*############
+  Method: whenSearchRequestDone(useArgumentsToGetAllAsArray)
+    integrate multiple ajax results of N-gram search.
+  ############*/
+  
+  function whenSearchRequestDone(useArgumentsToGetAllAsArray) {
+      var results = arguments;
+      var work = JsNgram['work'];
+      var log = JsNgram.log;
+      
+      if(work['deferred'].length == 1) { // adjust nesting level
+        results = [results];
+      }
+      log.v1('whole: ', results.length, results);
+      found = {}; // gather results by location.
+      $.each(results, function(j, result){
+        log.v1('j=', j, result);
+        if(result == undefined) {
+          log.v0('result is undefined. means ajax success with empty result.');
+          return(true);
+        }
+        // result is [data, status_text, jqXHR_object]
+        $.each(result[0], function(i, val){
+          log.v1('i=', i, val);
+          
+          var docId = val[0];
+          var pos = val[1];
+          if(!(docId in found)) {
+            found[docId] = {};
+          }
+          if(!(j in found[docId])) {
+            found[docId][j] = [];
+          }
+          found[docId][j].push(pos);
+          
+          strVal = JSON.stringify(val);
+          log.v1(val[0]);
+          var x = cheat[val[0]];
+          var xx = [x.substr(0, val[1]), '<b>', x.substr(val[1], work['nGram']), '</b>', x.substring(val[1] + work['nGram'], x.length)];
+          $('#result').append(JsNgram.makeResultHtml([work['what'], strVal, xx.join('')]));
+        });
+      });
+      
+      log.v1(JSON.stringify(found));
+      var perfection = JsNgram.findPerfection(found, work['nText']);
+      log.v1(JSON.stringify(perfection));
+      
+      for(var k = 0; k < perfection.length; k++) {
+        var val = perfection[k];
+        var x = cheat[val[0]];
+        var xx = [x.substr(0, val[1]), '<b>', x.substr(val[1], work['nWhat']), '</b>', x.substring(val[1] + work['nWhat'], x.length)];
+        JsNgram.resultSelector.append(JsNgram.makeResultHtml(['*', JSON.stringify(val), xx.join('')]));
+      }
+    
+  }
+  this.whenSearchRequestDone = whenSearchRequestDone;
+  
 /**/
   var cheat = {
     '/a': "私たちは、もっとも始めに、この文書 a を追加してみます。",
@@ -273,79 +396,9 @@ var JsNgram = new function(){
   ############*/
   
   function appendSearchResult(what) {
-    var nWhat = what.length;
-    var nGram = this.size;
-    var nIter = nWhat - nGram + 1;
-    var texts = [];
-    // single character text will not go into the loop.
-    for(var i = 0; i < nIter; i++) {
-      texts.push(what.substr(i, nGram));
-    }
-    
-    // for a short word
-    if(nWhat < nGram) {
-      texts.push(what);
-      this.log.v1('adjusted: ', texts);
-    }
-    
-    var nText = texts.length;
-    var deferred = [];
-    for(var i = 0; i < nText; i++) {
-      deferred.push(this.loadIndexFile(texts[i]));
-    }
-    
-    $.when.apply($, deferred).done(function(useArgumentsToGetAllAsArray){
-      var results = arguments;
-      if(deferred.length == 1) { // adjust nesting level
-        results = [results];
-      }
-      JsNgram.log.v1('whole: ', results.length, results);
-      found = {}; // gather results by location.
-      $.each(results, function(j, result){
-        JsNgram.log.v1('j=', j, result);
-        if(result == undefined) {
-          JsNgram.log.v0('result is undefined. means ajax success with empty result.');
-          return(true);
-        }
-        // result is [data, status_text, jqXHR_object]
-        $.each(result[0], function(i, val){
-          JsNgram.log.v1('i=', i, val);
-          
-          //var keyText = texts[j];
-          var docId = val[0];
-          var pos = val[1];
-          if(!(docId in found)) {
-            found[docId] = {};
-          }
-          //if(!(keyText in found[docId])) {
-          //  found[docId][keyText] = [];
-          if(!(j in found[docId])) {
-            found[docId][j] = [];
-          }
-          //found[docId][keyText].push(pos);
-          found[docId][j].push(pos);
-          // not using keyText, because what actually important is the sequence.
-          
-          strVal = JSON.stringify(val);
-          JsNgram.log.v1(val[0]);
-          var x = cheat[val[0]];
-          var xx = [x.substr(0, val[1]), '<b>', x.substr(val[1], nGram), '</b>', x.substring(val[1] + nGram, x.length)];
-          $('#result').append(JsNgram.makeResultHtml([what, strVal, xx.join('')]));
-        });
-      });
-      
-      JsNgram.log.v1(JSON.stringify(found));
-      var perfection = JsNgram.findPerfection(found, nText);
-      JsNgram.log.v1(JSON.stringify(perfection));
-      
-      for(var k = 0; k < perfection.length; k++) {
-        var val = perfection[k];
-        var x = cheat[val[0]];
-        var xx = [x.substr(0, val[1]), '<b>', x.substr(val[1], nWhat), '</b>', x.substring(val[1] + nWhat, x.length)];
-        $('#result').append(JsNgram.makeResultHtml(['*', JSON.stringify(val), xx.join('')]));
-      }
-    });
-    
+    this['work'] = this.startWork(what);
+    // wait until all ajax requests done.
+    $.when.apply($, this['work']['deferred']).done(whenSearchRequestDone);
   }
   this.appendSearchResult = appendSearchResult;
   
