@@ -27,6 +27,7 @@ var JsNgram = new function(){
     errorSelector: JQuery selector pointing error message box.
     ajaxJson: JQuery ajax settings for json.
     ajaxText: JQuery ajax settings for text.
+    work: structured data shared between callbacks while searching.
     verbose: level of verbosity to show debug information on console.
   ############*/
   
@@ -50,6 +51,7 @@ var JsNgram = new function(){
                     mimeType: 'text/plain; charset=utf8'
                   }, 
                   writable: true, configurable: true }, 
+    "work": { value: {}, writable: true, configurable: true }, 
     "verbose": { get: function(){ return _verbose; },
                  set: function(verbose){
                    if(!(verbose in [0,1,2,3])) {
@@ -87,10 +89,10 @@ var JsNgram = new function(){
   ############*/
   
   function search(text) {
-    this.log.v1('v1: ' + text);
-    this.log.v2('v2: ' + text);
-    this.log.v3('v3: ' + text);
-    
+    if(text == '') {
+      this.log.v1('blank query text is ignored.');
+      return;
+    }
     this.clearErrorMessage();
     this.clearSearchResult();
     this.appendSearchResult(text);
@@ -160,12 +162,14 @@ var JsNgram = new function(){
   ############*/
   
   function encodeKey(text) {
-    return(cutString2by2(toUnicodeArray(text).join('')).join(this.keySeparator));
+    return(
+      this.cutString2by2(this.toUnicodeArray(text).join('')).join(this.keySeparator)
+    );
   }
   this.encodeKey = encodeKey;
   
   /*############
-  toUnicodeArray(text)
+  Method: toUnicodeArray(text)
     convert text into strictly 4 digit hex string array of unicode.
   ############*/
   
@@ -177,9 +181,10 @@ var JsNgram = new function(){
     }
     return(encodedArr);
   }
+  this.toUnicodeArray = toUnicodeArray;
   
   /*############
-  cutString2by2(text)
+  Method: cutString2by2(text)
     convert text into two by two character array.
   ############*/
   
@@ -190,9 +195,10 @@ var JsNgram = new function(){
     }
     return(twoByTwo);
   }
+  this.cutString2by2 = cutString2by2;
   
   /*############
-  indexFileName(text)
+  Method: indexFileName(text)
     get json file name of index to find text.
   ############*/
   
@@ -214,34 +220,39 @@ var JsNgram = new function(){
   /*############
   Method: findPerfection(x, n)
     pick up perfect match from sorted result of N-gram partial matches.
-    x: sorted result of match
+    x: sorted result of match (by document)
     n: required count for perfect match
   ############*/
   
   function findPerfection(x, n) {
     var bag = [];
     var ids = Object.keys(x);
-    for(var i = 0; i < ids.length; i++) {
+    for(var i = 0; i < ids.length; i++) { // loop by document
       var xx = x[ids[i]];
-      var seqs = Object.keys(xx);
-      if(seqs.length < n) { continue; }
+      var seqs = Object.keys(xx);  // N-gram keys in the current document
+      if(seqs.length < n) { continue; }  // at least, should have all keys.
       
-      var mini = Number.MAX_SAFE_INTEGER;
+      // find a key that has minimum occurrences.
+      // this will help performance.
+      var mini = -1;
+      var miniLength = Number.MAX_SAFE_INTEGER;
       for(var j = 0; j < n; j++) {
-        if(xx[j].length < mini) {
+        if(xx[j].length < miniLength) {
+          miniLength = xx[j].length;
           mini = j;
         }
       }
       
+      // loop by occurence at mini.
       var xxx = xx[mini];
       for(var k = 0; k < xxx.length; k++) {
-        var p = xxx[k] - mini;
+        var p = xxx[k] - mini;  // valid sequences have same p values.
         for(var j = 0; j < n; j++) {
           if(j == mini) { continue; }
           var q = xx[j].indexOf(p + j);
-          if(q == -1) { break; }
+          if(q == -1) { break; }  // not valid
         }
-        if(j == n) {
+        if(j == n) { // valid
           bag.push([ids[i], p]);
         }
       }
