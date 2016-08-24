@@ -129,7 +129,7 @@ def test():
     in_dir = os.path.join(base_dir, 'txt')
     out_dir = os.path.join(base_dir, 'idx')
     ch_ignore = r'[\s,.，．、。]+'
-    verbose_print = True
+    verbose_print = False
     term_colors = {'OK': '\033[92m', 'NG': '\033[91m', 'DONE': '\033[0m'}
     
     def make_index_by_strings(data, n=ngram_size, shorter=ngram_shorter,
