@@ -8,10 +8,10 @@ $(document).ready(function(){
   JsNgram.errorSelector = $('#error');
   JsNgram.resultSelector = $('#result');
   JsNgram.size = 2;
-  JsNgram.indexBase = 'hoge/';
+  JsNgram.indexBase = 'idx/';
   JsNgram.textBase = 'txt/';
   JsNgram.keySeparator = '-';
-  JsNgram.verbose = 3;
+  JsNgram.verbose = 1;
   
   function enterSearch() {
     var what = $q.val();
