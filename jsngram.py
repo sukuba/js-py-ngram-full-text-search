@@ -1,4 +1,11 @@
-#!python3
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# written for python 3 but also run on python 2
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+import sys
+if sys.version_info[0]  == 2:
+    chr = unichr
 
 import re
 import json
@@ -87,6 +94,8 @@ class JsNgramReader(object):
         self.work = {'files':[], 'keys':[], 'data':[]}
         trim_ext = re.compile(r'\.json')
         for entry in os.listdir(self.src):
+            if entry[0] == '.':
+                continue  # skip dot files
             code = trim_ext.sub('', entry).split('-')
             code2 = [code[i] + code[i+1] for i in range(0, len(code), 2)]
             keys = [chr(int(asc, 16)) for asc in code2]
@@ -157,6 +166,8 @@ def test():
         """
         ix = JsNgram(n, shorter, src, ignore)
         for entry in os.listdir(src):
+            if entry[0] == '.':
+                continue  # skip dot files
             ix.add_file(entry, verbose_print)
         for entry in os.listdir(out):
             os.remove(os.path.join(out, entry))
