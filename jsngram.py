@@ -1,4 +1,11 @@
-#!python3
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# written for python 3 but also run on python 2
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+import sys
+if sys.version_info[0]  == 2:
+    chr = unichr
 
 import re
 import json
