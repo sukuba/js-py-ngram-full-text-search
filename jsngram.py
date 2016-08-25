@@ -94,6 +94,8 @@ class JsNgramReader(object):
         self.work = {'files':[], 'keys':[], 'data':[]}
         trim_ext = re.compile(r'\.json')
         for entry in os.listdir(self.src):
+            if entry[0] == '.':
+                continue  # skip dot files
             code = trim_ext.sub('', entry).split('-')
             code2 = [code[i] + code[i+1] for i in range(0, len(code), 2)]
             keys = [chr(int(asc, 16)) for asc in code2]
@@ -164,6 +166,8 @@ def test():
         """
         ix = JsNgram(n, shorter, src, ignore)
         for entry in os.listdir(src):
+            if entry[0] == '.':
+                continue  # skip dot files
             ix.add_file(entry, verbose_print)
         for entry in os.listdir(out):
             os.remove(os.path.join(out, entry))
