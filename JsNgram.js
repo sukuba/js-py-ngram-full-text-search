@@ -71,7 +71,7 @@ var JsNgram = new function(){
   
   function Log(verbose){
     function nop(){}
-    function log(msg){ console.log.apply(null, arguments); }
+    function log(msg){ console.log.apply(console, arguments); }
     this.v0 = log;
     this.v1 = (verbose < 1) ? nop : log;
     this.v2 = (verbose < 2) ? nop : log;
