@@ -11,7 +11,6 @@ import re
 import json
 import os
 import codecs
-import unicodedata
 import shutil
 
 class JsNgram(object):
@@ -71,11 +70,7 @@ class JsNgram(object):
             print(file_name)
         with codecs.open(file_name, 'r', 'utf-8') as infile:
             text = infile.read()
-        normalized = unicodedata.normalize('NFKC', text)
-        # normalize to Hanaku alphanum and Zenkaku kana
-        # ? this should be done outside of this module, 
-        # when generating the text file?
-        self.add_document(path, normalized)
+        self.add_document(path, text)
         
     def to_json(self, dest, flat=False, verbose=False):
         sep = '-' if flat else '/'

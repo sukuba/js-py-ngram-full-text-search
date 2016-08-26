@@ -51,7 +51,7 @@ def test():
         text files in src directory will be indexed.
         """
         ix = jsngram.jsngram.JsNgram(n, shorter, src, ignore)
-        for entry in list_files(src):
+        for entry in jsngram.jsngram.list_files(src):
             ix.add_file(entry, verbose_print)
         for entry in os.listdir(out):
             fullpath = os.path.join(out, entry)
@@ -100,7 +100,7 @@ def test():
         
     test_suite1()
     test_suite2()
-    #test_suite3()
+    test_suite3()
 
 if __name__ == '__main__':
     test()
