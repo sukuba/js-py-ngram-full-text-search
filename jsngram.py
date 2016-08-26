@@ -12,6 +12,7 @@ import json
 import os
 import codecs
 import unicodedata
+import shutil
 
 class JsNgram(object):
     """
@@ -71,16 +72,18 @@ class JsNgram(object):
         # when generating the text file?
         self.add_document(path, normalized)
         
-    def to_json(self, dest, verbose=False):
+    def to_json(self, dest, flat=False, verbose=False):
+        sep = '-' if flat else '/'
         for key in self.db.keys():
             hxs = []
             for c in key:
                 h = ('%#06x' % ord(c))[2:]  # fixed length 2 bytes
                 for i in range(0, len(h), 2):
                     hxs.append(h[i:i+2])
-            file_name = os.path.join(dest, '%s.json' % '-'.join(hxs))
+            file_name = os.path.join(dest, '%s.json' % sep.join(hxs))
             if verbose:
                 print(file_name)
+            ensure_dir(file_name)
             with codecs.open(file_name, 'w', 'utf-8') as outfile:
                 json.dump(self.db[key], outfile, ensure_ascii=False)
         
@@ -94,14 +97,13 @@ class JsNgramReader(object):
         self.work = {}
         self.src = os.path.realpath(src)
         
-    def read_flatfiles(self, verbose=False):
+    def read_files(self, verbose=False):
         self.db = {}
         self.work = {'files':[], 'keys':[], 'data':[]}
         trim_ext = re.compile(r'\.json')
-        for entry in os.listdir(self.src):
-            if entry[0] == '.':
-                continue  # skip dot files
-            code = trim_ext.sub('', entry).split('-')
+        split_code = re.compile(r'[-/]')
+        for entry in list_files(self.src):
+            code = split_code.split(trim_ext.sub('', entry))
             code2 = [code[i] + code[i+1] for i in range(0, len(code), 2)]
             keys = [chr(int(asc, 16)) for asc in code2]
             key = ''.join(keys)
@@ -135,7 +137,33 @@ class JsNgramReader(object):
                 print('')
         
 
+def ensure_dir(path):
+    """
+    make parent directories of path recursively, when they do not exist.
+    """
+    parent = os.path.dirname(path)
+    if not os.path.exists(parent):
+        os.makedirs(parent)
+    
 
+def list_files(path, base=None):
+    """
+    list files in a directory recursively, excluding dot files and dot directories.
+    return array of relative to path and alwasy use '/' even on Windows.
+    """
+    if not base:
+        base = path
+    bag = []
+    for entry in os.listdir(path):
+        if entry[0] == '.':
+            continue  # skip dot files and directories
+        fullpath = '/'.join([path, entry])  # not use os.path.join
+        if os.path.isfile(fullpath):
+            bag.append(fullpath[1+len(base):])  # not use os.path.relpath
+        else:
+            bag += list_files(fullpath, base)
+    return bag;
+    
 def test():
     base_dir = os.path.realpath('/scratch') # may be './scratch', or others.
     ngram_size = 2
@@ -143,6 +171,7 @@ def test():
     in_dir = os.path.join(base_dir, 'txt')
     out_dir = os.path.join(base_dir, 'idx')
     ch_ignore = r'[\s,.，．、。]+'
+    flat_dir = False
     verbose_print = False
     term_colors = {'OK': '\033[92m', 'NG': '\033[91m', 'DONE': '\033[0m'}
     
@@ -160,8 +189,12 @@ def test():
             path, content = doc
             ix.add_document(path, content)
         for entry in os.listdir(out):
-            os.remove(os.path.join(out, entry))
-        ix.to_json(out, verbose_print)
+            fullpath = os.path.join(out, entry)
+            if os.path.isfile(fullpath):
+                os.remove(fullpath)
+            else:
+                shutil.rmtree(fullpath)
+        ix.to_json(out, flat=flat_dir, verbose=verbose_print)
         return ix
         
     def make_index_by_files(n=ngram_size, shorter=ngram_shorter,
@@ -170,18 +203,20 @@ def test():
         text files in src directory will be indexed.
         """
         ix = JsNgram(n, shorter, src, ignore)
-        for entry in os.listdir(src):
-            if entry[0] == '.':
-                continue  # skip dot files
+        for entry in list_files(src):
             ix.add_file(entry, verbose_print)
         for entry in os.listdir(out):
-            os.remove(os.path.join(out, entry))
-        ix.to_json(out, verbose_print)
+            fullpath = os.path.join(out, entry)
+            if os.path.isfile(fullpath):
+                os.remove(fullpath)
+            else:
+                shutil.rmtree(fullpath)
+        ix.to_json(out, flat=flat_dir, verbose=verbose_print)
         return ix
         
     def read_index(src=out_dir):
         chk = JsNgramReader(src)
-        chk.read_flatfiles(verbose_print)
+        chk.read_files(verbose_print)
         return chk
         
     def test_suite1():
