@@ -10,7 +10,7 @@ $(document).ready(function(){
   JsNgram.size = 2;
   JsNgram.indexBase = 'idx/';
   JsNgram.textBase = 'txt/';
-  JsNgram.keySeparator = '-';
+  JsNgram.keySeparator = '/';
   JsNgram.verbose = 1;
   
   function enterSearch() {
