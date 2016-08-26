@@ -383,11 +383,13 @@ var JsNgram = new function(){
       var f2 = found[docId];
       var seqs = Object.keys(f2);  // N-gram keys in the current document
       for(var j = 0; j < seqs.length; j++) { // loop by key
-        var f3 = f2[seqs[j]];
+        var seq = seqs[j];
+        var f3 = f2[seq];
+        var text = this.work['texts'][seq];
         for(var k = 0; k < f3.length; k++) { // loop by position
           var pos = f3[k];
-          var strVal = JSON.stringify([docId, pos]);
-          this.loadFullText(docId, pos, this['work']['nGram'], this['work']['what']);
+          //this.loadFullText(docId, pos, this['work']['nGram'], this['work']['what']);
+          this.loadFullText(docId, pos, text.length, text);
         }
       }
     }
