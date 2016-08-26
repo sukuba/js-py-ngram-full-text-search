@@ -41,11 +41,16 @@ class JsNgram(object):
         
     def add_words(self, path, content, start):
         if len(content) == 0:
-            pass
-        elif len(content) < self.n:
+            return
+        nn = reversed(range(1, 1+self.n)) if self.shorter else [self.n]
+        # larger n should be processed on ahead, let shorter one overwrite them.
+        for n in nn:
+            self.add_words_re(n, path, content, start)
+        
+    def add_words_re(self, n, path, content, start):
+        if len(content) < n:
             self.add_index(content, path, start)
         else:
-            n = self.n
             N = len(content)
             for i in range(n, N+1):
                 pos = i - n
@@ -127,13 +132,16 @@ class JsNgramReader(object):
                 vals = self.db[key]
                 for val in vals:
                     if(val[0] == path):
-                        bag[val[1]] = key
+                        rev_key = val[1]
+                        if not rev_key in bag.keys():
+                            bag[rev_key] = []
+                        bag[rev_key].append(key)
             self.work['reverse'][path] = bag
             
             if verbose:
                 print(path)
                 for key in sorted(bag.keys()):
-                    print(bag[key], end=' ')
+                    print(sorted(bag[key]), end=' ')
                 print('')
         
 
@@ -230,6 +238,8 @@ def test():
         chk.reverse([u'this/is/a.txt', u'that/may/be/too.txt'], verbose_print)
         res = 'OK' if chk.db == ix.db else 'NG'
         print('[%s]: db should match.  suite1' % res)
+        #print(json.dumps(chk.work))
+        #print(json.dumps(chk.db))
         
     def test_suite2():
         ix = make_index_by_strings(
