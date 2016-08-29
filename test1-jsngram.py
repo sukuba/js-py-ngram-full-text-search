@@ -11,6 +11,8 @@ import os
 import shutil
 
 import jsngram.jsngram
+import jsngram.dir
+import jsngram.text
 
 def test():
     base_dir = os.path.realpath('/scratch') # may be './scratch', or others.
@@ -51,7 +53,7 @@ def test():
         text files in src directory will be indexed.
         """
         ix = jsngram.jsngram.JsNgram(n, shorter, src, ignore)
-        for entry in jsngram.jsngram.list_files(src):
+        for entry in jsngram.dir.list_files(src):
             ix.add_file(entry, verbose_print)
         for entry in os.listdir(out):
             fullpath = os.path.join(out, entry)
@@ -98,9 +100,23 @@ def test():
         res = 'OK' if chk.db == ix.db else 'NG'
         print('[%s]: db should match.  suite3' % res)
         
+    def test_suite4():
+        src = os.path.join(base_dir, 'hoge1')
+        dest = os.path.join(base_dir, 'hoge2')
+        jsngram.text.normalizeTexts(src, dest)
+        print('[]: normalized.  suite4')
+        
+    def test_suite5():
+        src = os.path.join(base_dir, 'hoge2')
+        dest = None
+        jsngram.text.normalizeTexts(src, dest)
+        print('[]: normalized.  suite5')
+        
     test_suite1()
     test_suite2()
     test_suite3()
+    test_suite4()
+    test_suite5()
 
 if __name__ == '__main__':
     test()

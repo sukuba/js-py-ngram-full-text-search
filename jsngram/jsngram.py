@@ -13,6 +13,8 @@ import os
 import codecs
 import shutil
 
+from . import dir
+
 class JsNgram(object):
     """
     N-gram index storage
@@ -83,7 +85,7 @@ class JsNgram(object):
             file_name = os.path.join(dest, '%s.json' % sep.join(hxs))
             if verbose:
                 print(file_name)
-            ensure_dir(file_name)
+            dir.ensure_dir(file_name)
             with codecs.open(file_name, 'w', 'utf-8') as outfile:
                 json.dump(self.db[key], outfile, ensure_ascii=False)
         
@@ -102,7 +104,7 @@ class JsNgramReader(object):
         self.work = {'files':[], 'keys':[], 'data':[]}
         trim_ext = re.compile(r'\.json')
         split_code = re.compile(r'[-/]')
-        for entry in list_files(self.src):
+        for entry in dir.list_files(self.src):
             code = split_code.split(trim_ext.sub('', entry))
             code2 = [code[i] + code[i+1] for i in range(0, len(code), 2)]
             keys = [chr(int(asc, 16)) for asc in code2]
@@ -140,33 +142,6 @@ class JsNgramReader(object):
                 print('')
         
 
-def ensure_dir(path):
-    """
-    make parent directories of path recursively, when they do not exist.
-    """
-    parent = os.path.dirname(path)
-    if not os.path.exists(parent):
-        os.makedirs(parent)
-    
-
-def list_files(path, base=None):
-    """
-    list files in a directory recursively, excluding dot files and dot directories.
-    return array of relative to path and alwasy use '/' even on Windows.
-    """
-    if not base:
-        base = path
-    bag = []
-    for entry in os.listdir(path):
-        if entry[0] == '.':
-            continue  # skip dot files and directories
-        fullpath = '/'.join([path, entry])  # not use os.path.join
-        if os.path.isfile(fullpath):
-            bag.append(fullpath[1+len(base):])  # not use os.path.relpath
-        else:
-            bag += list_files(fullpath, base)
-    return bag;
-    
 def test():
     base_dir = os.path.realpath('/scratch') # may be './scratch', or others.
     ngram_size = 2
@@ -206,7 +181,7 @@ def test():
         text files in src directory will be indexed.
         """
         ix = JsNgram(n, shorter, src, ignore)
-        for entry in list_files(src):
+        for entry in dir.list_files(src):
             ix.add_file(entry, verbose_print)
         for entry in os.listdir(out):
             fullpath = os.path.join(out, entry)
