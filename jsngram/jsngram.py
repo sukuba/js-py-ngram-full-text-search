@@ -14,16 +14,20 @@ import codecs
 import shutil
 
 from . import dir2
+from . import json2
 
 class JsNgram(object):
     """
     N-gram index storage
     """
-    def __init__(self, n=2, shorter=True, src='.', ignore=r'[\s,.，．、。]+'):
+    def __init__(self, n=2, shorter=True, src='.', dest='.', flat=False,
+                 ignore=r'[\s,.，．、。]+'):
         self.db = {}
         self.n = n
         self.shorter = (shorter == True)
         self.src = os.path.realpath(src)
+        self.dest = os.path.realpath(dest)
+        self.flat = (flat == True)
         self.ignore = re.compile(ignore)
         
     def has_key(self, key):
@@ -74,21 +78,43 @@ class JsNgram(object):
             text = infile.read()
         self.add_document(path, text)
         
-    def to_json(self, dest, flat=False, verbose=False):
-        sep = '-' if flat else '/'
+    def to_json(self, verbose=False):
+        sep = '-' if self.flat else '/'
         for key in self.db.keys():
             hxs = []
             for c in key:
                 h = ('%#06x' % ord(c))[2:]  # fixed length 2 bytes
                 for i in range(0, len(h), 2):
                     hxs.append(h[i:i+2])
-            file_name = os.path.join(dest, '%s.json' % sep.join(hxs))
+            file_name = os.path.join(self.dest, '%s.json' % sep.join(hxs))
             if verbose:
                 print(file_name)
             dir2.ensure_dir(file_name)
             with codecs.open(file_name, 'w', 'utf-8') as outfile:
                 json.dump(self.db[key], outfile, ensure_ascii=False)
         
+    def add_files_to_json(self, paths, verbose):
+        # json files will not have end tag.
+        self.db = {}
+        files = []
+        for path in paths:
+            self.add_file(path, verbose)
+        
+        sep = '-' if self.flat else '/'
+        for key in self.db.keys():
+            hxs = []
+            for c in key:
+                h = ('%#06x' % ord(c))[2:]  # fixed length 2 bytes
+                for i in range(0, len(h), 2):
+                    hxs.append(h[i:i+2])
+            file_name = os.path.join(self.dest, '%s.json' % sep.join(hxs))
+            if verbose:
+                print(file_name)
+            files.append(file_name)
+            dir2.ensure_dir(file_name)
+            json2.json_append(file_name, self.db[key], list=True)
+        
+        return(files)
 
 class JsNgramReader(object):
     """
