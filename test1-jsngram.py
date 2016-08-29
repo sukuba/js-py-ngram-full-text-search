@@ -11,8 +11,8 @@ import os
 import shutil
 
 import jsngram.jsngram
-import jsngram.dir
-import jsngram.text
+import jsngram.dir2
+import jsngram.text2
 
 def test():
     base_dir = os.path.realpath('/scratch') # may be './scratch', or others.
@@ -53,7 +53,7 @@ def test():
         text files in src directory will be indexed.
         """
         ix = jsngram.jsngram.JsNgram(n, shorter, src, ignore)
-        for entry in jsngram.dir.list_files(src):
+        for entry in jsngram.dir2.list_files(src):
             ix.add_file(entry, verbose_print)
         for entry in os.listdir(out):
             fullpath = os.path.join(out, entry)
@@ -103,13 +103,13 @@ def test():
     def test_suite4():
         src = os.path.join(base_dir, 'hoge1')
         dest = os.path.join(base_dir, 'hoge2')
-        jsngram.text.normalizeTexts(src, dest)
+        jsngram.text2.normalize_texts(src, dest)
         print('[]: normalized.  suite4')
         
     def test_suite5():
         src = os.path.join(base_dir, 'hoge2')
         dest = None
-        jsngram.text.normalizeTexts(src, dest)
+        jsngram.text2.normalize_texts(src, dest)
         print('[]: normalized.  suite5')
         
     test_suite1()
