@@ -178,18 +178,34 @@ var JsNgram = new function(){
   this.clearSearchResult = clearSearchResult;
   
   /*############
-  Method: makeResultHtml(result)
+  Method: makeResultHtml
     generate html for result.
+    sub functions:
+      header: generate table headers.
+      content: generate table contents.
+      columns: number of columns.
   ############*/
   
-  function makeResultHtml(result) {
-    var tr = [];
-    tr.push('<tr><td>');
-    tr.push(result.join('</td><td>'));
-    tr.push('</td></tr>');
-    return(tr.join(blankText));
-  }
-  this.makeResultHtml = makeResultHtml;
+  this.makeResultHtml = {
+    'header': function(){
+      var data = [
+        'Word', 'Url', 'Position', 'Content'
+      ];
+      var tr = [];
+      tr.push('<tr><th>');
+      tr.push(data.join('</th><th>'));
+      tr.push('</th></tr>');
+      return(tr.join(blankText));
+    },
+    'content': function(data){
+      var tr = [];
+      tr.push('<tr><td>');
+      tr.push(data.join('</td><td>'));
+      tr.push('</td></tr>');
+      return(tr.join(blankText));
+    },
+    'columns': 4
+  };
   
   /*############
   Method: makeLinkToFound()
@@ -197,8 +213,9 @@ var JsNgram = new function(){
   ############*/
   
   function makeLinkToFound() {
+    var colNum = this.makeResultHtml.columns;
     return($('<tr></tr>').append(
-      $('<td colspan="4"></td>').append(
+      $('<td colspan="' + colNum + '"></td>').append(
         $('<button type="button"></button>').append(
           askToShowFound
         ).on('click', function(){
@@ -347,13 +364,31 @@ var JsNgram = new function(){
   ############*/
   
   function loadFullText(docId, pos, hiLen, tag) {
+    var contentFn = this.makeResultHtml.content;
+    var hilightFn = this.makeTextHilighted;
+    var resultSelector = this.resultSelector;
+    var esc = this.escapeHtml;
+    
     return($.ajax(this.fulltextFileName(docId), this.ajaxText).always(function(result){
       // success: result is string, fail: result is object
-      var x = (typeof result === 'object') ? blankText : JsNgram.makeTextHilighted(result, pos, hiLen);
-      JsNgram.resultSelector.append(JsNgram.makeResultHtml([tag, docId, pos, x]));
+      var x = (typeof result === 'object') ? blankText : hilightFn(result, pos, hiLen);
+      resultSelector.append(contentFn([tag, esc(docId), pos, x]));
     }));
   }
   this.loadFullText = loadFullText;
+  
+  /*############
+  Method: loadHeader()
+    show header at result.
+  ############*/
+  
+  function loadHeader() {
+    var headerFn = this.makeResultHtml.header;
+    var resultSelector = this.resultSelector;
+    
+    return(resultSelector.append(headerFn()));
+  }
+  this.loadHeader = loadHeader;
   
   /*############
   Method: findPerfection(x, n)
@@ -363,10 +398,11 @@ var JsNgram = new function(){
   ############*/
   
   function findPerfection(x, n) {
-    var bag = [];
+    var bag = {};
     var ids = Object.keys(x);
     for(var i = 0; i < ids.length; i++) { // loop by document
-      var xx = x[ids[i]];
+      var docId = ids[i];
+      var xx = x[docId];
       var seqs = Object.keys(xx);  // N-gram keys in the current document
       if(seqs.length < n) { continue; }  // at least, should have all keys.
       
@@ -391,7 +427,11 @@ var JsNgram = new function(){
           if(q == -1) { break; }  // not valid
         }
         if(j == n) { // valid
-          bag.push([ids[i], p]);
+          if(!(docId in bag)) {
+            bag[docId] = [];
+          }
+          bag[docId].push([p]);
+          // put in nested array to make it as same as 'found'
         }
       }
     }
@@ -477,15 +517,48 @@ var JsNgram = new function(){
   this.showLinkToFound = showLinkToFound;
   
   /*############
-  Method: showFound(found)
-    show found (partial matches).
+  Method: showFound(perfection)
+    show found result. both for perfection and found (partial match).
   ############*/
   
-  function showFound(found) {
+  function showFound(perfection) {
+    var ids = Object.keys(perfection);
+    var n = ids.length;
+    this.log.v1('showFound: ', n);
+    
+    var what = this['work']['what'];
+    
+    var deferred = [];
+    for(var i = 0; i < ids.length; i++) { // loop by document
+      var docId = ids[i];
+      var poss = perfection[docId];
+      for(var k = 0; k < poss.length; k++) {
+        var val = poss[k];
+        var pos = val[0];
+        var text = val[1];
+        if(!text) {
+          text = what;
+        }
+        var hiLen = text.length;
+        deferred.push(this.loadFullText(docId, pos, hiLen, text));
+      }
+    }
+    return(deferred);
+  }
+  this.showFound = showFound;
+  
+  /*############
+  Method: sortFoundByDocument(found)
+    rebuild found as document sorted, as same as perfection.
+  ############*/
+  
+  function sortFoundByDocument(found) {
+    var bag = {};
     var ids = Object.keys(found);
     for(var i = 0; i < ids.length; i++) { // loop by document
       var docId = ids[i];
       var f2 = found[docId];
+      var newF2 = [];
       var seqs = Object.keys(f2);  // N-gram keys in the current document
       for(var j = 0; j < seqs.length; j++) { // loop by key
         var seq = seqs[j];
@@ -493,33 +566,14 @@ var JsNgram = new function(){
         var text = this.work['texts'][seq];
         for(var k = 0; k < f3.length; k++) { // loop by position
           var pos = f3[k];
-          //this.loadFullText(docId, pos, this['work']['nGram'], this['work']['what']);
-          this.loadFullText(docId, pos, text.length, text);
+          newF2.push([pos, text]);
         }
       }
+      bag[docId] = newF2;
     }
+    return(bag);
   }
-  this.showFound = showFound;
-  
-  /*############
-  Method: showPerfection(perfection)
-    show perfection.
-  ############*/
-  
-  function showPerfection(perfection) {
-    var n = perfection.length;
-    this.log.v1('perfection: ', n);
-    
-    var deferred = [];
-    for(var k = 0; k < n; k++) {
-      var val = perfection[k];
-      var docId = val[0];
-      var pos = val[1];
-      deferred.push(this.loadFullText(docId, pos, this['work']['nWhat'], '*'));
-    }
-    return(deferred);
-  }
-  this.showPerfection = showPerfection;
+  this.sortFoundByDocument = sortFoundByDocument;
   
   /*############
   Method: sortResultsByLocation(results)
@@ -577,11 +631,14 @@ var JsNgram = new function(){
     log.v1(JSON.stringify(perfection));
     
     work['result']['perfection'] = perfection;
-    work['result']['found'] = found;
+    work['result']['found'] = JsNgram.sortFoundByDocument(found);
     
-    JsNgram.showResultMessage(perfection.length);
-    var deferred = JsNgram.showPerfection(perfection);
-    $.when.apply($, deferred).done(JsNgram.showLinkToFound);
+    JsNgram.showResultMessage(Object.keys(perfection).length);
+    
+    $.when(JsNgram.loadHeader()).done(function(){
+      var deferred = JsNgram.showFound(perfection);
+      $.whenAlways.apply($, deferred).done(JsNgram.showLinkToFound);
+    });
   }
   this.whenSearchRequestDone = whenSearchRequestDone;
   
@@ -598,6 +655,100 @@ var JsNgram = new function(){
   this.appendSearchResult = appendSearchResult;
   
 };
+
+/*############
+Add a method to JQery: whenAlways
+that is a copy of original 'when' of JQery, 
+but promises are resolved even if it failed.
+
+This block comes from jquery-3.1.0.js
+############*/
+
+	// Deferred helper
+$.whenAlways = function( singleValue ) {
+  
+function adoptValue( value, resolve, reject ) {
+	var method;
+
+	try {
+
+		// Check for promise aspect first to privilege synchronous behavior
+		if ( value && jQuery.isFunction( ( method = value.promise ) ) ) {
+			method.call( value ).done( resolve ).fail( reject );
+
+		// Other thenables
+		} else if ( value && jQuery.isFunction( ( method = value.then ) ) ) {
+			method.call( value, resolve, reject );
+
+		// Other non-thenables
+		} else {
+
+			// Support: Android 4.0 only
+			// Strict mode functions invoked without .call/.apply get global-object context
+			resolve.call( undefined, value );
+		}
+
+	// For Promises/A+, convert exceptions into rejections
+	// Since jQuery.when doesn't unwrap thenables, we can skip the extra checks appearing in
+	// Deferred#then to conditionally suppress rejection.
+	} catch ( value ) {
+
+		// Support: Android 4.0 only
+		// Strict mode functions invoked without .call/.apply get global-object context
+		reject.call( undefined, value );
+	}
+}
+  
+		var
+
+			// count of uncompleted subordinates
+			remaining = arguments.length,
+
+			// count of unprocessed arguments
+			i = remaining,
+
+			// subordinate fulfillment data
+			resolveContexts = Array( i ),
+//			resolveValues = slice.call( arguments ),
+			resolveValues = [].slice.call( arguments ),
+
+			// the master Deferred
+			master = jQuery.Deferred(),
+
+			// subordinate callback factory
+			updateFunc = function( i ) {
+				return function( value ) {
+					resolveContexts[ i ] = this;
+//					resolveValues[ i ] = arguments.length > 1 ? slice.call( arguments ) : value;
+					resolveValues[ i ] = arguments.length > 1 ? [].slice.call( arguments ) : value;
+					if ( !( --remaining ) ) {
+						master.resolveWith( resolveContexts, resolveValues );
+					}
+				};
+			};
+
+		// Single- and empty arguments are adopted like Promise.resolve
+		if ( remaining <= 1 ) {
+//			adoptValue( singleValue, master.done( updateFunc( i ) ).resolve, master.reject );
+			adoptValue( singleValue, master.done( updateFunc( i ) ).resolve, master.fail( updateFunc( i ) ).resolve );
+
+			// Use .then() to unwrap secondary thenables (cf. gh-3000)
+			if ( master.state() === "pending" ||
+				jQuery.isFunction( resolveValues[ i ] && resolveValues[ i ].then ) ) {
+
+				return master.then();
+			}
+		}
+
+		// Multiple arguments are aggregated like Promise.all array elements
+		while ( i-- ) {
+//			adoptValue( resolveValues[ i ], updateFunc( i ), master.reject );
+			adoptValue( resolveValues[ i ], updateFunc( i ), updateFunc( i ) );
+		}
+
+		return master.promise();
+	}
+;
 
 /* enable this when you wish to run within Node.js ...
 return(JsNgram);
