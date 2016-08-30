@@ -84,20 +84,42 @@ var JsNgram = new function(){
   this.verbose = 0;
   
   /*############
+  Variables for message
+  ############*/
+  
+  var blankText = '';
+  var msgOnSearch = 'Searching ... please, wait.';
+  var ignoreBlank = 'Blank query text is ignored.';
+  var resultNone = 'Nothing found.';
+  var resultCount = ' found.';
+  var askToShowFound = 'Want partial matches?';
+  
+  /*############
   Method: search(text)
     perform search on text and insert results in html.
   ############*/
   
   function search(text) {
-    if(text == '') {
-      this.log.v1('blank query text is ignored.');
+    if(text == blankText) {
+      this.log.v1(ignoreBlank);
       return;
     }
     this.clearErrorMessage();
     this.clearSearchResult();
-    this.appendSearchResult(text);
+    this.showOnSearchMessage();
+    this.appendSearchResult(this.normalizeText(text));
   }
   this.search = search;
+  
+  /*############
+  Method: normalizeText(text)
+    normalize text on search.
+  ############*/
+  
+  function normalizeText(text) {
+    return(text.toLowerCase());
+  }
+  this.normalizeText = normalizeText;
   
   /*############
   Method: showErrorMessage(msg)
@@ -110,12 +132,38 @@ var JsNgram = new function(){
   this.showErrorMessage = showErrorMessage;
   
   /*############
+  Method: showOnSearchMessage()
+    show progress message on error box.
+  ############*/
+  
+  function showOnSearchMessage() {
+    this.showErrorMessage(msgOnSearch);
+  }
+  this.showOnSearchMessage = showOnSearchMessage;
+  
+  /*############
+  Method: showResultMessage(count)
+    show result message on error box.
+  ############*/
+  
+  function showResultMessage(count) {
+    var msg;
+    if(count > 0) {
+      msg = [count, resultCount].join(blankText);
+    } else {
+      msg = resultNone
+    }
+    this.showErrorMessage(msg);
+  }
+  this.showResultMessage = showResultMessage;
+  
+  /*############
   Method: clearErrorMessage()
     clear content of error box.
   ############*/
   
   function clearErrorMessage() {
-    this.showErrorMessage('');
+    this.showErrorMessage(blankText);
   }
   this.clearErrorMessage = clearErrorMessage;
   
@@ -125,23 +173,79 @@ var JsNgram = new function(){
   ############*/
   
   function clearSearchResult() {
-    this.resultSelector.html('');
+    this.resultSelector.html(blankText);
   }
   this.clearSearchResult = clearSearchResult;
   
   /*############
-  Method: makeResultHtml(result)
+  Method: makeResultHtml
+    generate html for result.
+    sub functions:
+      header: generate table headers.
+      content: generate table contents.
+      columns: number of columns.
+  ############*/
+  
+  this.makeResultHtml = {
+    'header': function(){
+      var data = [
+        'Word', 'Url', 'Position', 'Content'
+      ];
+      var tr = [];
+      tr.push('<tr><th>');
+      tr.push(data.join('</th><th>'));
+      tr.push('</th></tr>');
+      return(tr.join(blankText));
+    },
+    'content': function(data){
+      var tr = [];
+      tr.push('<tr><td>');
+      tr.push(data.join('</td><td>'));
+      tr.push('</td></tr>');
+      return(tr.join(blankText));
+    },
+    'columns': 4
+  };
+  
+  /*############
+  Method: makeLinkToFound()
     generate html for result.
   ############*/
   
-  function makeResultHtml(result) {
-    var tr = [];
-    tr.push('<tr><td>');
-    tr.push(result.join('</td><td>'));
-    tr.push('</td></tr>');
-    return(tr.join(''));
+  function makeLinkToFound() {
+    var colNum = this.makeResultHtml.columns;
+    return($('<tr></tr>').append(
+      $('<td colspan="' + colNum + '"></td>').append(
+        $('<button type="button"></button>').append(
+          askToShowFound
+        ).on('click', function(){
+          this.disabled=true;
+          JsNgram.showFound(JsNgram.work.result.found);
+        })
+      )
+    ));
   }
-  this.makeResultHtml = makeResultHtml;
+  this.makeLinkToFound = makeLinkToFound;
+  
+  /*############
+  Method: escapeHtml(text)
+    escape html special characters.
+  ############*/
+  
+  var escHtmlFrom = new RegExp(/[&<>"'`]/, 'g');
+  var escHtmlTo = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#x27;',
+    '`': '&#x60;'
+  }
+  
+  function escapeHtml(text) {
+    return(text.replace(escHtmlFrom, function(x){return escHtmlTo[x];}));
+  }
+  this.escapeHtml = escapeHtml;
   
   /*############
   Method: makeTextHilighted(text, at, hiLen, outLen)
@@ -149,17 +253,23 @@ var JsNgram = new function(){
   ############*/
   
   function makeTextHilighted(text, at, hiLen, outLen) {
-    if(text == '') { return(''); }
+    if(text == blankText) { return(blankText); }
     
-    var outLen = typeof outLen !== 'undefined' ? outLen : 100;
+    var outLen = typeof outLen !== 'undefined' ? outLen : 240;
     // ES6 can default value with 'outLen=100', but be conservative.
     
     var start = at - Math.floor((outLen - hiLen) / 2);
     if(start < 0) { start = 0; }
     var x = text.substr(start, outLen);
     var pos = at - start;
-    var xx = [x.substr(0, pos), '<b>', x.substr(pos, hiLen), '</b>', x.substring(pos + hiLen, outLen)];
-    return(xx.join(''));
+    var xx = [
+                escapeHtml(x.substr(0, pos)),
+                '<b>',
+                escapeHtml(x.substr(pos, hiLen)),
+                '</b>',
+                escapeHtml(x.substring(pos + hiLen, outLen))
+              ];
+    return(xx.join(blankText));
   }
   this.makeTextHilighted = makeTextHilighted;
   
@@ -172,7 +282,8 @@ var JsNgram = new function(){
     var msg =xhr.status + ' / ' + thrownError;
     var msg2 = this.url + ' / ' + msg;
     JsNgram.log.v0(msg2);
-    JsNgram.showErrorMessage(msg2);
+    //JsNgram.showErrorMessage(msg2);
+    JsNgram.showResultMessage(0);
   }
   this.failMessageHandler = failMessageHandler;
   
@@ -183,7 +294,7 @@ var JsNgram = new function(){
   
   function encodeKey(text) {
     return(
-      this.cutString2by2(this.toUnicodeArray(text).join('')).join(this.keySeparator)
+      this.cutString2by2(this.toUnicodeArray(text).join(blankText)).join(this.keySeparator)
     );
   }
   this.encodeKey = encodeKey;
@@ -253,13 +364,31 @@ var JsNgram = new function(){
   ############*/
   
   function loadFullText(docId, pos, hiLen, tag) {
+    var contentFn = this.makeResultHtml.content;
+    var hilightFn = this.makeTextHilighted;
+    var resultSelector = this.resultSelector;
+    var esc = this.escapeHtml;
+    
     return($.ajax(this.fulltextFileName(docId), this.ajaxText).always(function(result){
       // success: result is string, fail: result is object
-      var x = (typeof result === 'object') ? '' : JsNgram.makeTextHilighted(result, pos, hiLen);
-      JsNgram.resultSelector.append(JsNgram.makeResultHtml([tag, docId, pos, x]));
+      var x = (typeof result === 'object') ? blankText : hilightFn(result, pos, hiLen);
+      resultSelector.append(contentFn([tag, esc(docId), pos, x]));
     }));
   }
   this.loadFullText = loadFullText;
+  
+  /*############
+  Method: loadHeader()
+    show header at result.
+  ############*/
+  
+  function loadHeader() {
+    var headerFn = this.makeResultHtml.header;
+    var resultSelector = this.resultSelector;
+    
+    return(resultSelector.append(headerFn()));
+  }
+  this.loadHeader = loadHeader;
   
   /*############
   Method: findPerfection(x, n)
@@ -269,10 +398,11 @@ var JsNgram = new function(){
   ############*/
   
   function findPerfection(x, n) {
-    var bag = [];
+    var bag = {};
     var ids = Object.keys(x);
     for(var i = 0; i < ids.length; i++) { // loop by document
-      var xx = x[ids[i]];
+      var docId = ids[i];
+      var xx = x[docId];
       var seqs = Object.keys(xx);  // N-gram keys in the current document
       if(seqs.length < n) { continue; }  // at least, should have all keys.
       
@@ -297,7 +427,11 @@ var JsNgram = new function(){
           if(q == -1) { break; }  // not valid
         }
         if(j == n) { // valid
-          bag.push([ids[i], p]);
+          if(!(docId in bag)) {
+            bag[docId] = [];
+          }
+          bag[docId].push([p]);
+          // put in nested array to make it as same as 'found'
         }
       }
     }
@@ -319,6 +453,7 @@ var JsNgram = new function(){
     work['nIter'] = work['nWhat'] - work['nGram'] + 1;
     work['texts'] = this.generateTexts(work);
     work['nText'] = work['texts'].length;
+    work['result'] = {};
     work['deferred'] = this.generateDeferred(work);
     // the last one submits multiple ajax requests.
     return(work);
@@ -372,15 +507,58 @@ var JsNgram = new function(){
   this.generateDeferred = generateDeferred;
   
   /*############
-  Method: showFound(found)
-    show found.
+  Method: showLinkToFound()
+    privide a link to show found.
   ############*/
   
-  function showFound(found) {
+  function showLinkToFound() {
+    JsNgram.resultSelector.append(JsNgram.makeLinkToFound());
+  }
+  this.showLinkToFound = showLinkToFound;
+  
+  /*############
+  Method: showFound(perfection)
+    show found result. both for perfection and found (partial match).
+  ############*/
+  
+  function showFound(perfection) {
+    var ids = Object.keys(perfection);
+    var n = ids.length;
+    this.log.v1('showFound: ', n);
+    
+    var what = this['work']['what'];
+    
+    var deferred = [];
+    for(var i = 0; i < ids.length; i++) { // loop by document
+      var docId = ids[i];
+      var poss = perfection[docId];
+      for(var k = 0; k < poss.length; k++) {
+        var val = poss[k];
+        var pos = val[0];
+        var text = val[1];
+        if(!text) {
+          text = what;
+        }
+        var hiLen = text.length;
+        deferred.push(this.loadFullText(docId, pos, hiLen, text));
+      }
+    }
+    return(deferred);
+  }
+  this.showFound = showFound;
+  
+  /*############
+  Method: sortFoundByDocument(found)
+    rebuild found as document sorted, as same as perfection.
+  ############*/
+  
+  function sortFoundByDocument(found) {
+    var bag = {};
     var ids = Object.keys(found);
     for(var i = 0; i < ids.length; i++) { // loop by document
       var docId = ids[i];
       var f2 = found[docId];
+      var newF2 = [];
       var seqs = Object.keys(f2);  // N-gram keys in the current document
       for(var j = 0; j < seqs.length; j++) { // loop by key
         var seq = seqs[j];
@@ -388,31 +566,14 @@ var JsNgram = new function(){
         var text = this.work['texts'][seq];
         for(var k = 0; k < f3.length; k++) { // loop by position
           var pos = f3[k];
-          //this.loadFullText(docId, pos, this['work']['nGram'], this['work']['what']);
-          this.loadFullText(docId, pos, text.length, text);
+          newF2.push([pos, text]);
         }
       }
+      bag[docId] = newF2;
     }
+    return(bag);
   }
-  this.showFound = showFound;
-  
-  /*############
-  Method: showPerfection(perfection)
-    show perfection.
-  ############*/
-  
-  function showPerfection(perfection) {
-    var n = perfection.length;
-    this.log.v1('perfection: ', n);
-    
-    for(var k = 0; k < n; k++) {
-      var val = perfection[k];
-      var docId = val[0];
-      var pos = val[1];
-      this.loadFullText(docId, pos, this['work']['nWhat'], '*');
-    }
-  }
-  this.showPerfection = showPerfection;
+  this.sortFoundByDocument = sortFoundByDocument;
   
   /*############
   Method: sortResultsByLocation(results)
@@ -465,11 +626,19 @@ var JsNgram = new function(){
     
     var found = JsNgram.sortResultsByLocation(results);
     log.v1(JSON.stringify(found));
-    JsNgram.showFound(found);
     
     var perfection = JsNgram.findPerfection(found, work['nText']);
     log.v1(JSON.stringify(perfection));
-    JsNgram.showPerfection(perfection);
+    
+    work['result']['perfection'] = perfection;
+    work['result']['found'] = JsNgram.sortFoundByDocument(found);
+    
+    JsNgram.showResultMessage(Object.keys(perfection).length);
+    
+    $.when(JsNgram.loadHeader()).done(function(){
+      var deferred = JsNgram.showFound(perfection);
+      $.whenAlways.apply($, deferred).done(JsNgram.showLinkToFound);
+    });
   }
   this.whenSearchRequestDone = whenSearchRequestDone;
   
@@ -486,6 +655,100 @@ var JsNgram = new function(){
   this.appendSearchResult = appendSearchResult;
   
 };
+
+/*############
+Add a method to JQery: whenAlways
+that is a copy of original 'when' of JQery, 
+but promises are resolved even if it failed.
+
+This block comes from jquery-3.1.0.js
+############*/
+
+	// Deferred helper
+$.whenAlways = function( singleValue ) {
+  
+function adoptValue( value, resolve, reject ) {
+	var method;
+
+	try {
+
+		// Check for promise aspect first to privilege synchronous behavior
+		if ( value && jQuery.isFunction( ( method = value.promise ) ) ) {
+			method.call( value ).done( resolve ).fail( reject );
+
+		// Other thenables
+		} else if ( value && jQuery.isFunction( ( method = value.then ) ) ) {
+			method.call( value, resolve, reject );
+
+		// Other non-thenables
+		} else {
+
+			// Support: Android 4.0 only
+			// Strict mode functions invoked without .call/.apply get global-object context
+			resolve.call( undefined, value );
+		}
+
+	// For Promises/A+, convert exceptions into rejections
+	// Since jQuery.when doesn't unwrap thenables, we can skip the extra checks appearing in
+	// Deferred#then to conditionally suppress rejection.
+	} catch ( value ) {
+
+		// Support: Android 4.0 only
+		// Strict mode functions invoked without .call/.apply get global-object context
+		reject.call( undefined, value );
+	}
+}
+  
+		var
+
+			// count of uncompleted subordinates
+			remaining = arguments.length,
+
+			// count of unprocessed arguments
+			i = remaining,
+
+			// subordinate fulfillment data
+			resolveContexts = Array( i ),
+//			resolveValues = slice.call( arguments ),
+			resolveValues = [].slice.call( arguments ),
+
+			// the master Deferred
+			master = jQuery.Deferred(),
+
+			// subordinate callback factory
+			updateFunc = function( i ) {
+				return function( value ) {
+					resolveContexts[ i ] = this;
+//					resolveValues[ i ] = arguments.length > 1 ? slice.call( arguments ) : value;
+					resolveValues[ i ] = arguments.length > 1 ? [].slice.call( arguments ) : value;
+					if ( !( --remaining ) ) {
+						master.resolveWith( resolveContexts, resolveValues );
+					}
+				};
+			};
+
+		// Single- and empty arguments are adopted like Promise.resolve
+		if ( remaining <= 1 ) {
+//			adoptValue( singleValue, master.done( updateFunc( i ) ).resolve, master.reject );
+			adoptValue( singleValue, master.done( updateFunc( i ) ).resolve, master.fail( updateFunc( i ) ).resolve );
+
+			// Use .then() to unwrap secondary thenables (cf. gh-3000)
+			if ( master.state() === "pending" ||
+				jQuery.isFunction( resolveValues[ i ] && resolveValues[ i ].then ) ) {
+
+				return master.then();
+			}
+		}
+
+		// Multiple arguments are aggregated like Promise.all array elements
+		while ( i-- ) {
+//			adoptValue( resolveValues[ i ], updateFunc( i ), master.reject );
+			adoptValue( resolveValues[ i ], updateFunc( i ), updateFunc( i ) );
+		}
+
+		return master.promise();
+	}
+;
 
 /* enable this when you wish to run within Node.js ...
 return(JsNgram);
