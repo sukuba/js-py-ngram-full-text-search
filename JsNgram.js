@@ -23,15 +23,19 @@ var JsNgram = new function(){
     textBase: base url to refer text files.
     keySeparator: '/' for subdirectory keys, '-' for flat file keys.
     keyExt: file ext, such as '.json'.
+    previewSize: text length shown as preview; see LoadFullText and makeTextHilighted.
     resultSelector: JQuery selector pointing result wrapper.
     errorSelector: JQuery selector pointing error message box.
     ajaxJson: JQuery ajax settings for json.
     ajaxText: JQuery ajax settings for text.
     work: structured data shared between callbacks while searching.
     verbose: level of verbosity to show debug information on console.
+   * message constants
+    msgOnSearch, ignoreBlank, resultNone, resultCount, askToShowFound
   ############*/
   
   var _verbose;
+  var _blankText = '';
   
   Object.defineProperties(this, {
     "size": { value: 2, writable: true, configurable: true }, 
@@ -39,6 +43,7 @@ var JsNgram = new function(){
     "textBase": { value: 'txt/', writable: true, configurable: true }, 
     "keySeparator": { value: '/', writable: true, configurable: true }, 
     "keyExt": { value: '.json', writable: true, configurable: true }, 
+    "previewSize": { value: 240, writable: true, configurable: true }, 
     "resultSelector": { value: undefined, writable: true, configurable: true }, 
     "errorSelector": { value: undefined, writable: true, configurable: true }, 
     "ajaxJson": { value: {
@@ -51,6 +56,11 @@ var JsNgram = new function(){
                     mimeType: 'text/plain; charset=utf8'
                   }, 
                   writable: true, configurable: true }, 
+    "msgOnSearch": { value: 'Searching ... please, wait.', writable: true, configurable: true }, 
+    "ignoreBlank": { value: 'Blank query text is ignored.', writable: true, configurable: true }, 
+    "resultNone": { value: 'Nothing found.', writable: true, configurable: true }, 
+    "resultCount": { value: ' found.', writable: true, configurable: true }, 
+    "askToShowFound": { value: 'Want partial matches?', writable: true, configurable: true }, 
     "work": { value: {}, writable: true, configurable: true }, 
     "verbose": { get: function(){ return _verbose; },
                  set: function(verbose){
@@ -84,24 +94,14 @@ var JsNgram = new function(){
   this.verbose = 0;
   
   /*############
-  Variables for message
-  ############*/
-  
-  var blankText = '';
-  var msgOnSearch = 'Searching ... please, wait.';
-  var ignoreBlank = 'Blank query text is ignored.';
-  var resultNone = 'Nothing found.';
-  var resultCount = ' found.';
-  var askToShowFound = 'Want partial matches?';
-  
-  /*############
   Method: search(text)
     perform search on text and insert results in html.
+    this will be called when a search button is pushed.
   ############*/
   
   function search(text) {
-    if(text == blankText) {
-      this.log.v1(ignoreBlank);
+    if(text == _blankText) {
+      this.log.v1(this.ignoreBlank);
       return;
     }
     this.clearErrorMessage();
@@ -137,7 +137,7 @@ var JsNgram = new function(){
   ############*/
   
   function showOnSearchMessage() {
-    this.showErrorMessage(msgOnSearch);
+    this.showErrorMessage(this.msgOnSearch);
   }
   this.showOnSearchMessage = showOnSearchMessage;
   
@@ -149,9 +149,9 @@ var JsNgram = new function(){
   function showResultMessage(count) {
     var msg;
     if(count > 0) {
-      msg = [count, resultCount].join(blankText);
+      msg = [count, this.resultCount].join(_blankText);
     } else {
-      msg = resultNone
+      msg = this.resultNone
     }
     this.showErrorMessage(msg);
   }
@@ -163,7 +163,7 @@ var JsNgram = new function(){
   ############*/
   
   function clearErrorMessage() {
-    this.showErrorMessage(blankText);
+    this.showErrorMessage(_blankText);
   }
   this.clearErrorMessage = clearErrorMessage;
   
@@ -173,7 +173,7 @@ var JsNgram = new function(){
   ############*/
   
   function clearSearchResult() {
-    this.resultSelector.html(blankText);
+    this.resultSelector.html(_blankText);
   }
   this.clearSearchResult = clearSearchResult;
   
@@ -195,14 +195,14 @@ var JsNgram = new function(){
       tr.push('<tr><th>');
       tr.push(data.join('</th><th>'));
       tr.push('</th></tr>');
-      return(tr.join(blankText));
+      return(tr.join(_blankText));
     },
     'content': function(data){
       var tr = [];
       tr.push('<tr><td>');
       tr.push(data.join('</td><td>'));
       tr.push('</td></tr>');
-      return(tr.join(blankText));
+      return(tr.join(_blankText));
     },
     'columns': 4
   };
@@ -217,7 +217,7 @@ var JsNgram = new function(){
     return($('<tr></tr>').append(
       $('<td colspan="' + colNum + '"></td>').append(
         $('<button type="button"></button>').append(
-          askToShowFound
+          JsNgram.askToShowFound
         ).on('click', function(){
           this.disabled=true;
           JsNgram.showFound(JsNgram.work.result.found);
@@ -253,10 +253,10 @@ var JsNgram = new function(){
   ############*/
   
   function makeTextHilighted(text, at, hiLen, outLen) {
-    if(text == blankText) { return(blankText); }
+    if(text == _blankText) { return(_blankText); }
     
     var outLen = typeof outLen !== 'undefined' ? outLen : 240;
-    // ES6 can default value with 'outLen=100', but be conservative.
+    // ES6 can use default value with declaring 'outLen=100', but be conservative.
     
     var start = at - Math.floor((outLen - hiLen) / 2);
     if(start < 0) { start = 0; }
@@ -269,7 +269,7 @@ var JsNgram = new function(){
                 '</b>',
                 escapeHtml(x.substring(pos + hiLen, outLen))
               ];
-    return(xx.join(blankText));
+    return(xx.join(_blankText));
   }
   this.makeTextHilighted = makeTextHilighted;
   
@@ -284,6 +284,7 @@ var JsNgram = new function(){
     JsNgram.log.v0(msg2);
     //JsNgram.showErrorMessage(msg2);
     JsNgram.showResultMessage(0);
+    // notify end-user just result was 0, avoiding show them technical messages.
   }
   this.failMessageHandler = failMessageHandler;
   
@@ -294,7 +295,7 @@ var JsNgram = new function(){
   
   function encodeKey(text) {
     return(
-      this.cutString2by2(this.toUnicodeArray(text).join(blankText)).join(this.keySeparator)
+      this.cutString2by2(this.toUnicodeArray(text).join(_blankText)).join(this.keySeparator)
     );
   }
   this.encodeKey = encodeKey;
@@ -368,10 +369,11 @@ var JsNgram = new function(){
     var hilightFn = this.makeTextHilighted;
     var resultSelector = this.resultSelector;
     var esc = this.escapeHtml;
+    var outLen = this.previewSize;
     
     return($.ajax(this.fulltextFileName(docId), this.ajaxText).always(function(result){
       // success: result is string, fail: result is object
-      var x = (typeof result === 'object') ? blankText : hilightFn(result, pos, hiLen);
+      var x = (typeof result === 'object') ? _blankText : hilightFn(result, pos, hiLen, outLen);
       resultSelector.append(contentFn([tag, esc(docId), pos, x]));
     }));
   }
@@ -638,6 +640,8 @@ var JsNgram = new function(){
     $.when(JsNgram.loadHeader()).done(function(){
       var deferred = JsNgram.showFound(perfection);
       $.whenAlways.apply($, deferred).done(JsNgram.showLinkToFound);
+      //$.when.apply($, deferred).always(JsNgram.showLinkToFound);
+      // this is not good, because 'when' returns immediately after 'fail'.
     });
   }
   this.whenSearchRequestDone = whenSearchRequestDone;
