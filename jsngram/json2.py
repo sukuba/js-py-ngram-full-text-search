@@ -3,9 +3,12 @@
 # written for python 3 but also run on python 2
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-
 """
-json array increment filer
+jsngram package:
+  Simple N-gram full text search engine on JavaScript and Python.
+  https://github.com/sukuba/js-py-ngram-full-text-search
+jsngram.json2:
+  json array increment filer
 
 json_append:
   append an object without an end bracket.

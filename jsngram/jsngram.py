@@ -7,6 +7,14 @@ import sys
 if sys.version_info[0]  == 2:
     chr = unichr
 
+"""
+jsngram package:
+  Simple N-gram full text search engine on JavaScript and Python.
+  https://github.com/sukuba/js-py-ngram-full-text-search
+jsngram.jsngram:
+  Generates N-gram index as json files
+"""
+
 import re
 import json
 import os
