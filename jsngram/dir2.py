@@ -39,33 +39,42 @@ def list_files(path, base=None):
             bag += list_files(fullpath, base)
     return bag;
     
-def apply_files(path, func):
+def apply_files(path, dest, func):
     """
     scan files in a directory recursively, excluding dot files and dot directories.
     apply 'func' to each file.
-    'func' is a function with an argument of the file full path.
-    return a file list with the return values of 'func'.
+    'func' is a function with two arguments (full path of source file, destination directory).
+    return a file list with destination and return values of 'func'.
+    create dest directory tree before calling func unless dest=None.
     """
     bag = []
+    if dest and not os.path.exists(dest):
+        os.makedirs(dest)
     for entry in os.listdir(path):
         if entry[0] == '.':
             continue  # skip dot files and directories
         fullpath = os.path.join(path, entry)
         if os.path.isfile(fullpath):
-            bag += [(fullpath, func(fullpath))]
+            bag += [(fullpath, dest, func(fullpath, dest))]
         else:
-            bag += apply_files(fullpath, func)
+            next_dest = os.path.join(dest, entry) if dest else None
+            bag += apply_files(fullpath, next_dest, func)
     return bag;
     
 def test():
     base_dir = os.path.realpath('/scratch') # may be './scratch', or others.
     target = os.path.join(base_dir, 'hoge1')
     
-    def myfunc(path):
+    def myfunc(path, dest):
         return path
         
-    ret = apply_files(target, myfunc)
+    ret = apply_files(target, None, myfunc)
     print(ret)
+    
+    out_dir = os.path.join(base_dir, 'hoge3')
+    ret = apply_files(target, out_dir, myfunc)
+    print(ret)
+    
 
 if __name__ == '__main__':
     test()
