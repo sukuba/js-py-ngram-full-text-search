@@ -3,6 +3,14 @@
 # written for python 3 but also run on python 2
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+"""
+jsngram package:
+  Simple N-gram full text search engine on JavaScript and Python.
+  https://github.com/sukuba/js-py-ngram-full-text-search
+jsngram.text2:
+  utf-8 text tools
+"""
+
 import os
 import codecs
 import unicodedata
