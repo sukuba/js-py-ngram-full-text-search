@@ -21,7 +21,6 @@ def ensure_dir(path):
     if not os.path.exists(parent):
         os.makedirs(parent)
     
-
 def list_files(path, base=None):
     """
     list files in a directory recursively, excluding dot files and dot directories.
@@ -40,3 +39,33 @@ def list_files(path, base=None):
             bag += list_files(fullpath, base)
     return bag;
     
+def apply_files(path, func):
+    """
+    scan files in a directory recursively, excluding dot files and dot directories.
+    apply 'func' to each file.
+    'func' is a function with an argument of the file full path.
+    return a file list with the return values of 'func'.
+    """
+    bag = []
+    for entry in os.listdir(path):
+        if entry[0] == '.':
+            continue  # skip dot files and directories
+        fullpath = os.path.join(path, entry)
+        if os.path.isfile(fullpath):
+            bag += [(fullpath, func(fullpath))]
+        else:
+            bag += apply_files(fullpath, func)
+    return bag;
+    
+def test():
+    base_dir = os.path.realpath('/scratch') # may be './scratch', or others.
+    target = os.path.join(base_dir, 'hoge1')
+    
+    def myfunc(path):
+        return path
+        
+    ret = apply_files(target, myfunc)
+    print(ret)
+
+if __name__ == '__main__':
+    test()
