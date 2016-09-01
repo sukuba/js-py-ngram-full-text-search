@@ -59,7 +59,7 @@ var JsNgram = new function(){
     "msgOnSearch": { value: 'Searching ... please, wait.', writable: true, configurable: true }, 
     "ignoreBlank": { value: 'Blank query text is ignored.', writable: true, configurable: true }, 
     "resultNone": { value: 'Nothing found.', writable: true, configurable: true }, 
-    "resultCount": { value: ' found.', writable: true, configurable: true }, 
+    "resultCount": { value: '%% hits in %% documents.', writable: true, configurable: true }, 
     "askToShowFound": { value: 'Want partial matches?', writable: true, configurable: true }, 
     "work": { value: {}, writable: true, configurable: true }, 
     "verbose": { get: function(){ return _verbose; },
@@ -148,8 +148,8 @@ var JsNgram = new function(){
   
   function showResultMessage(count) {
     var msg;
-    if(count > 0) {
-      msg = [count, this.resultCount].join(_blankText);
+    if(count[0] > 0) {
+      msg = this.sprintf(this.resultCount, count);
     } else {
       msg = this.resultNone
     }
@@ -247,6 +247,20 @@ var JsNgram = new function(){
   }
   this.escapeHtml = escapeHtml;
   
+  /*############
+  Method: sprintf(format, arr)
+    insert data of arr into format at %%.
+  ############*/
+  
+  function sprintf(format, arr) {
+    var s = format;
+    for(var i = 0; i < arr.length; i++) {
+      s = s.replace(/%%/, arr[i]);
+    }
+    return(s);
+  }
+  this.sprintf = sprintf;
+
   /*############
   Method: makeTextHilighted(text, at, hiLen, outLen)
     generate html with text hilighted.
@@ -407,6 +421,7 @@ var JsNgram = new function(){
   ############*/
   
   function findPerfection(x, n) {
+    var workHits = JsNgram.work.result.hits.perfection; // hits by [pos, doc]
     var bag = {};
     var ids = Object.keys(x);
     for(var i = 0; i < ids.length; i++) { // loop by document
@@ -438,9 +453,11 @@ var JsNgram = new function(){
         if(j == n) { // valid
           if(!(docId in bag)) {
             bag[docId] = [];
+            workHits[1]++;
           }
           bag[docId].push([p]);
           // put in nested array to make it as same as 'found'
+          workHits[0]++;
         }
       }
     }
@@ -462,7 +479,7 @@ var JsNgram = new function(){
     work['nIter'] = work['nWhat'] - work['nGram'] + 1;
     work['texts'] = this.generateTexts(work);
     work['nText'] = work['texts'].length;
-    work['result'] = {};
+    work['result'] = {'hits':{'found':[0,0],'perfection':[0,0]}};
     work['deferred'] = this.generateDeferred(work);
     // the last one submits multiple ajax requests.
     return(work);
@@ -591,6 +608,7 @@ var JsNgram = new function(){
   
   function sortResultsByLocation(results) {
     var log = JsNgram.log;
+    var workHits = JsNgram.work.result.hits.found; // hits by [pos, doc]
     var found = {}; // gather results by location.
     
     $.each(results, function(j, result){
@@ -608,12 +626,14 @@ var JsNgram = new function(){
         
         if(!(docId in found)) {
           found[docId] = {};
+          workHits[1]++;
         }
         if(!(j in found[docId])) {
           found[docId][j] = [];
         }
         
         found[docId][j].push(pos);
+        workHits[0]++;
       });
     });
     return(found);
@@ -642,7 +662,10 @@ var JsNgram = new function(){
     work['result']['perfection'] = perfection;
     work['result']['found'] = JsNgram.sortFoundByDocument(found);
     
-    JsNgram.showResultMessage(Object.keys(perfection).length);
+    var hits = work.result.hits;
+    JsNgram.showResultMessage(hits.perfection);
+    log.v1('Found:', JsNgram.sprintf(JsNgram.resultCount, hits.perfection));
+    log.v1('Found:', JsNgram.sprintf(JsNgram.resultCount, hits.found));
     
     $.when(JsNgram.loadHeader()).done(function(){
       var deferred = JsNgram.showFound(perfection);
