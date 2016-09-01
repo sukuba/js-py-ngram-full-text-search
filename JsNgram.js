@@ -196,6 +196,27 @@ var JsNgram = new function(){
         'Word', 'Url', 'Position', 'Content'
       ];
       var tr = [];
+      tr.push('<div class="head"><span>');
+      tr.push(data.join('</span><span>'));
+      tr.push('</span></div>');
+      return(tr.join(_blankText));
+    },
+    'content': function(data){
+      var tr = [];
+      tr.push('<div class="hit"><span>');
+      tr.push(data.join('</span><span>'));
+      tr.push('</span></div>');
+      return(tr.join(_blankText));
+    }
+  };
+  
+  /*
+  this.makeResultHtml = {
+    'header': function(){
+      var data = [
+        'Word', 'Url', 'Position', 'Content'
+      ];
+      var tr = [];
       tr.push('<tr><th>');
       tr.push(data.join('</th><th>'));
       tr.push('</th></tr>');
@@ -210,6 +231,7 @@ var JsNgram = new function(){
     },
     'columns': 4
   };
+  */
   
   /*############
   Method: makeLinkToFound()
@@ -249,15 +271,13 @@ var JsNgram = new function(){
       }
     }
     
-    return($('<tr></tr>').append(
-      $('<td colspan="' + colNum + '"></td>').append(
-        $('<button type="button"></button>').append(
-          face
-        ).on('click', function(){
-          this.disabled=true;
-          JsNgram.showPage(isPerfection, selector, doc, start);
-        })
-      )
+    return($('<div class="ui"></div>').append(
+      $('<button type="button"></button>').append(
+        face
+      ).on('click', function(){
+        this.disabled=true;
+        JsNgram.showPage(isPerfection, selector, doc, start);
+      })
     ));
   }
   this.makeLinkToNext = makeLinkToNext;
