@@ -371,11 +371,18 @@ var JsNgram = new function(){
     var esc = this.escapeHtml;
     var outLen = this.previewSize;
     
-    return($.ajax(this.fulltextFileName(docId), this.ajaxText).always(function(result){
-      // success: result is string, fail: result is object
-      var x = (typeof result === 'object') ? _blankText : hilightFn(result, pos, hiLen, outLen);
-      resultSelector.append(contentFn([tag, esc(docId), pos, x]));
-    }));
+    // wrap $.ajax by $.when, 
+    // because when multiple deferreds contains a fail, 
+    // the surrounding when returns immediately, 
+    // and that will cause unexpected sequence at caller, namely, 'whenSearchRequestDone'.
+    return($.when(
+      $.ajax(this.fulltextFileName(docId), this.ajaxText).done(function(result){
+        var x = hilightFn(result, pos, hiLen, outLen);
+        resultSelector.append(contentFn([tag, esc(docId), pos, x]));
+      }).fail(function(xhr, ajaxOptions, thrownError){
+        resultSelector.append(contentFn([tag, esc(docId), pos, _blankText]));
+      })
+    ));
   }
   this.loadFullText = loadFullText;
   
@@ -639,9 +646,8 @@ var JsNgram = new function(){
     
     $.when(JsNgram.loadHeader()).done(function(){
       var deferred = JsNgram.showFound(perfection);
-      $.whenAlways.apply($, deferred).done(JsNgram.showLinkToFound);
-      //$.when.apply($, deferred).always(JsNgram.showLinkToFound);
-      // this is not good, because 'when' returns immediately after 'fail'.
+      $.when.apply($, deferred).always(JsNgram.showLinkToFound);
+      // this comes to work with the redundant when block in 'loadFullText'.
     });
   }
   this.whenSearchRequestDone = whenSearchRequestDone;
@@ -659,100 +665,6 @@ var JsNgram = new function(){
   this.appendSearchResult = appendSearchResult;
   
 };
-
-/*############
-Add a method to JQery: whenAlways
-that is a copy of original 'when' of JQery, 
-but promises are resolved even if it failed.
-
-This block comes from jquery-3.1.0.js
-############*/
-
-	// Deferred helper
-$.whenAlways = function( singleValue ) {
-  
-function adoptValue( value, resolve, reject ) {
-	var method;
-
-	try {
-
-		// Check for promise aspect first to privilege synchronous behavior
-		if ( value && jQuery.isFunction( ( method = value.promise ) ) ) {
-			method.call( value ).done( resolve ).fail( reject );
-
-		// Other thenables
-		} else if ( value && jQuery.isFunction( ( method = value.then ) ) ) {
-			method.call( value, resolve, reject );
-
-		// Other non-thenables
-		} else {
-
-			// Support: Android 4.0 only
-			// Strict mode functions invoked without .call/.apply get global-object context
-			resolve.call( undefined, value );
-		}
-
-	// For Promises/A+, convert exceptions into rejections
-	// Since jQuery.when doesn't unwrap thenables, we can skip the extra checks appearing in
-	// Deferred#then to conditionally suppress rejection.
-	} catch ( value ) {
-
-		// Support: Android 4.0 only
-		// Strict mode functions invoked without .call/.apply get global-object context
-		reject.call( undefined, value );
-	}
-}
-  
-		var
-
-			// count of uncompleted subordinates
-			remaining = arguments.length,
-
-			// count of unprocessed arguments
-			i = remaining,
-
-			// subordinate fulfillment data
-			resolveContexts = Array( i ),
-//			resolveValues = slice.call( arguments ),
-			resolveValues = [].slice.call( arguments ),
-
-			// the master Deferred
-			master = jQuery.Deferred(),
-
-			// subordinate callback factory
-			updateFunc = function( i ) {
-				return function( value ) {
-					resolveContexts[ i ] = this;
-//					resolveValues[ i ] = arguments.length > 1 ? slice.call( arguments ) : value;
-					resolveValues[ i ] = arguments.length > 1 ? [].slice.call( arguments ) : value;
-					if ( !( --remaining ) ) {
-						master.resolveWith( resolveContexts, resolveValues );
-					}
-				};
-			};
-
-		// Single- and empty arguments are adopted like Promise.resolve
-		if ( remaining <= 1 ) {
-//			adoptValue( singleValue, master.done( updateFunc( i ) ).resolve, master.reject );
-			adoptValue( singleValue, master.done( updateFunc( i ) ).resolve, master.fail( updateFunc( i ) ).resolve );
-
-			// Use .then() to unwrap secondary thenables (cf. gh-3000)
-			if ( master.state() === "pending" ||
-				jQuery.isFunction( resolveValues[ i ] && resolveValues[ i ].then ) ) {
-
-				return master.then();
-			}
-		}
-
-		// Multiple arguments are aggregated like Promise.all array elements
-		while ( i-- ) {
-//			adoptValue( resolveValues[ i ], updateFunc( i ), master.reject );
-			adoptValue( resolveValues[ i ], updateFunc( i ), updateFunc( i ) );
-		}
-
-		return master.promise();
-	}
-;
 
 /* enable this when you wish to run within Node.js ...
 return(JsNgram);
