@@ -31,16 +31,30 @@ h1, h2, h3, option {
   font-size: 1rem;
   margin: 0;
 }
-table {
-  border-collapse: collapse;
-  width: 100%;
-}
-th, td {
-  text-align: left;
-}
-tr {
+.hit, .ui, .doc, .head {
   border-bottom: 0.1rem solid silver;
 }
+.hit {
+  display: flex;
+}
+/*
+.hit span {
+  display: block;
+}
+*/
+.hit :nth-child(1) {
+  width:10%;
+}
+.hit :nth-child(2) {
+  width:10%;
+}
+.hit :nth-child(3) {
+  width:20%;
+}
+.hit :nth-child(4) {
+  width:60%;
+}
+
 #error {
   color: crimson;
 }
