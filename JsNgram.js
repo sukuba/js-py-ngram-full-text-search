@@ -24,6 +24,7 @@ var JsNgram = new function(){
     keySeparator: '/' for subdirectory keys, '-' for flat file keys.
     keyExt: file ext, such as '.json'.
     previewSize: text length shown as preview; see LoadFullText and makeTextHilighted.
+    outputLimiter: hit counts shown at once.
     resultSelector: JQuery selector pointing result wrapper.
     errorSelector: JQuery selector pointing error message box.
     ajaxJson: JQuery ajax settings for json.
@@ -44,6 +45,7 @@ var JsNgram = new function(){
     "keySeparator": { value: '/', writable: true, configurable: true }, 
     "keyExt": { value: '.json', writable: true, configurable: true }, 
     "previewSize": { value: 240, writable: true, configurable: true }, 
+    "outputLimiter": { value: 100, writable: true, configurable: true }, 
     "resultSelector": { value: undefined, writable: true, configurable: true }, 
     "errorSelector": { value: undefined, writable: true, configurable: true }, 
     "ajaxJson": { value: {
@@ -543,11 +545,14 @@ var JsNgram = new function(){
   this.showLinkToFound = showLinkToFound;
   
   /*############
-  Method: showFound(perfection)
+  Method: showFoundUnlimited(perfection)
     show found result. both for perfection and found (partial match).
+    OBSOLETE version of showFound, that shows results without limit.
+    maybe, useful for debugging small amount of data, 
+    but the browser will crash when given a lot of data (too many uses of ajax).
   ############*/
   
-  function showFound(perfection) {
+  function showFoundUnlimited(perfection) {
     var ids = Object.keys(perfection);
     var n = ids.length;
     this.log.v1('showFound: ', n);
@@ -559,6 +564,42 @@ var JsNgram = new function(){
       var docId = ids[i];
       var poss = perfection[docId];
       for(var k = 0; k < poss.length; k++) {
+        var val = poss[k];
+        var pos = val[0];
+        var text = val[1];
+        if(!text) {
+          text = what;
+        }
+        var hiLen = text.length;
+        deferred.push(this.loadFullText(docId, pos, hiLen, text));
+      }
+    }
+    return(deferred);
+  }
+  
+  /*############
+  Method: showFound(perfection)
+    show found result. both for perfection and found (partial match).
+  ############*/
+  
+  function showFound(perfection) {
+    var ids = Object.keys(perfection);
+    var n = ids.length;
+    this.log.v1('showFound: ', n);
+    
+    var what = this.work.what;
+    var limit = this.outputLimiter;
+    var counter = 0;
+    
+    var deferred = [];
+    for(var i = 0; i < ids.length; i++) { // loop by document
+      var docId = ids[i];
+      var poss = perfection[docId];
+      for(var k = 0; k < poss.length; k++) {
+        if(++counter > limit) {
+          this.log.v1('limit: ', counter, i, k);
+          return(deferred);
+        }
         var val = poss[k];
         var pos = val[0];
         var text = val[1];
