@@ -24,7 +24,8 @@ var JsNgram = new function(){
     keySeparator: '/' for subdirectory keys, '-' for flat file keys.
     keyExt: file ext, such as '.json'.
     previewSize: text length shown as preview; see LoadFullText and makeTextHilighted.
-    outputLimiter: hit counts shown at once.
+    outputLimiter: doc or hit counts shown at once.
+    outputLimiter1st: hit counts shown at the 1st time with doc.
     resultSelector: JQuery selector pointing result wrapper.
     errorSelector: JQuery selector pointing error message box.
     ajaxJson: JQuery ajax settings for json.
@@ -32,7 +33,8 @@ var JsNgram = new function(){
     work: structured data shared between callbacks while searching.
     verbose: level of verbosity to show debug information on console.
    * message constants
-    msgOnSearch, ignoreBlank, resultNone, resultCount, askToShowFound
+    msgOnSearch, ignoreBlank, resultNone, resultCount, askToShowFound,
+    askToShowNextDocs, askToShowNextHits, partialMatches
   ############*/
   
   var _verbose;
@@ -46,6 +48,7 @@ var JsNgram = new function(){
     "keyExt": { value: '.json', writable: true, configurable: true }, 
     "previewSize": { value: 240, writable: true, configurable: true }, 
     "outputLimiter": { value: 100, writable: true, configurable: true }, 
+    "outputLimiter1st": { value: 1, writable: true, configurable: true }, 
     "resultSelector": { value: undefined, writable: true, configurable: true }, 
     "errorSelector": { value: undefined, writable: true, configurable: true }, 
     "ajaxJson": { value: {
@@ -63,7 +66,8 @@ var JsNgram = new function(){
     "resultNone": { value: 'Nothing found.', writable: true, configurable: true }, 
     "resultCount": { value: '%% hits in %% documents.', writable: true, configurable: true }, 
     "askToShowFound": { value: 'Want partial matches?', writable: true, configurable: true }, 
-    "askToShowNext": { value: 'Show after %% ... ', writable: true, configurable: true }, 
+    "askToShowNextDocs": { value: 'More documents after %% ... ', writable: true, configurable: true }, 
+    "askToShowNextHits": { value: '+ More hits after %% ... ', writable: true, configurable: true }, 
     "partialMatches": { value: '(partial matches)', writable: true, configurable: true }, 
     "work": { value: {}, writable: true, configurable: true }, 
     "verbose": { get: function(){ return _verbose; },
@@ -207,6 +211,9 @@ var JsNgram = new function(){
       tr.push(data.join('</span><span>'));
       tr.push('</span></div>');
       return(tr.join(_blankText));
+    },
+    'docbox': function(){
+      return('<div class="doc"></div>');
     }
   };
   
@@ -255,17 +262,17 @@ var JsNgram = new function(){
   this.makeLinkToFound = makeLinkToFound;
   
   /*############
-  Method: makeLinkToNext(isPerfection, selector, doc, start)
+  Method: makeLinkToNext(isPerfection, selector, doc, start, limit)
     generate html for result.
   ############*/
   
-  function makeLinkToNext(isPerfection, selector, doc, start) {
+  function makeLinkToNext(isPerfection, selector, doc, start, limit) {
     var colNum = this.makeResultHtml.columns;
     var face;
     if(!isPerfection && !doc && start == 0) {
       face = JsNgram.askToShowFound;
     } else {
-      face = this.sprintf(this.askToShowNext, [start]);
+      face = this.sprintf(doc ? this.askToShowNextHits : this.askToShowNextDocs, [start]);
       if(!isPerfection) {
         face += JsNgram.partialMatches;
       }
@@ -276,7 +283,7 @@ var JsNgram = new function(){
         face
       ).on('click', function(){
         this.disabled=true;
-        JsNgram.showPage(isPerfection, selector, doc, start);
+        JsNgram.showPage(isPerfection, selector, doc, start, limit);
       })
     ));
   }
@@ -598,13 +605,13 @@ var JsNgram = new function(){
   this.showLinkToFound = showLinkToFound;
   
   /*############
-  Method: showLinkToNext(isPerfection, selector, doc, start)
+  Method: showLinkToNext(isPerfection, selector, doc, start, limit)
     privide a link to show found.
   ############*/
   
-  function showLinkToNext(isPerfection, selector, doc, start) {
+  function showLinkToNext(isPerfection, selector, doc, start, limit) {
     return function(){
-      JsNgram.resultSelector.append(JsNgram.makeLinkToNext(isPerfection, selector, doc, start));
+      selector.append(JsNgram.makeLinkToNext(isPerfection, selector, doc, start, limit));
     };
   }
   this.showLinkToNext = showLinkToNext;
@@ -643,14 +650,15 @@ var JsNgram = new function(){
   }
   
   /*############
-  Method: showFound(perfection, selector, doc, start)
+  Method: showFoundAllHits(perfection, selector, doc, start)
+    OBSOLETE version of showFound, that shows results by hit.
     show found result. both for perfection and found (partial match).
     selector: resultSelector
     doc: null or docId
     start: number to skip records
   ############*/
   
-  function showFound(perfection, selector, doc, start) {
+  function showFoundAllHits(perfection, selector, doc, start) {
     var ids = Object.keys(perfection);
     var n = ids.length;
     this.log.v1('showFound: ', n);
@@ -683,40 +691,133 @@ var JsNgram = new function(){
     }
     return({'deferred':deferred});
   }
+  
+  /*############
+  Method: showFoundByHit(perfection, selector, doc, start, limit)
+    show found result as a list of hits
+  ############*/
+  
+  function showFoundByHit(perfection, selector, doc, start, limit) {
+    var ids = Object.keys(perfection);
+    var docNo = ids.indexOf(doc);
+    var docId = ids[docNo];
+    this.log.v1('showFoundByHit: ', docNo, doc);
+    this.log.v2(ids);
+    
+    var poss = perfection[docId];
+    var nposs = poss.length;
+    var what = this.work.what;
+    var end = limit + start;
+    var counter = 0;
+    var deferred = [];
+    
+    for(var k = 0; k < nposs; k++) {
+      if(counter++ < start) {
+        continue;
+      }
+      if(counter > end) {
+        this.log.v1('limit: ', start, counter, k);
+        return({'deferred':deferred, 'next':end});
+      }
+      var val = poss[k];
+      var pos = val[0];
+      var text = val[1];
+      if(!text) {
+        text = what;
+      }
+      var hiLen = text.length;
+      deferred.push(this.loadFullText(selector, docId, pos, hiLen, text));
+    }
+    
+    return({'deferred':deferred});
+  }
+  this.showFoundByHit = showFoundByHit;
+  
+  /*############
+  Method: showFoundByDoc(isPerfection, perfection, selector, start, limit)
+    show found result as a list of docs
+  ############*/
+  
+  function showFoundByDoc(isPerfection, perfection, selector, start, limit) {
+    var ids = Object.keys(perfection);
+    var n = ids.length;
+    this.log.v1('showFoundByDoc: ', n);
+    
+    var what = this.work.what;
+    var end = limit + start;
+    var counter = 0;
+    var deferred = [];
+    
+    for(var i = 0; i < n; i++) { // loop by document
+      if(counter++ < start) {
+        continue;
+      }
+      if(counter > end) {
+        this.log.v1('limit: ', start, counter, i);
+        return({'deferred':deferred, 'next':end});
+      }
+      
+      var docId = ids[i];
+      var docSelector = $(this.makeResultHtml.docbox());
+      
+      deferred.push($.when(selector.append(docSelector)).done(function(){
+        JsNgram.log.v2('into hits: ', docId);
+        JsNgram.showPage(isPerfection, docSelector, docId, 0, JsNgram.outputLimiter1st);
+      }));
+    }
+    
+    return({'deferred':deferred});
+  }
+  this.showFoundByDoc = showFoundByDoc;
+  
+  /*############
+  Method: showFound(isPerfection, selector, doc, start, limit)
+    show found result. both for perfection and found (partial match).
+    selector: resultSelector
+    doc: null or docId
+    start: number to skip records
+    limit: number of limit to show at once
+  ############*/
+  
+  function showFound(isPerfection, selector, doc, start, limit) {
+    var perfection = isPerfection ? this.work.result.perfection : this.work.result.found;
+    if(doc) { // show hits inside a doc
+      return(this.showFoundByHit(perfection, selector, doc, start, limit));
+    } else { // show docs in perfection with some hits
+      return(this.showFoundByDoc(isPerfection, perfection, selector, start, limit));
+    }
+  }
   this.showFound = showFound;
   
   /*############
-  Method: showPage(perfection, selector, doc, start)
+  Method: showPage(perfection, selector, doc, start, limit)
     wrapper of showFound to enable pager.
     to put 'more' or something.
   ############*/
   
-  function showPage(isPerfection, selector, doc, start) {
-    //return($.when(JsNgram.loadHeader()).done(function(){
-    var perfection = isPerfection ? JsNgram.work.result.perfection : JsNgram.work.result.found;
-      var pager = JsNgram.showFound(perfection, selector, doc, start);
-      var deferred = pager.deferred;
-      var nextStart = pager.next;
-      var nextCommand;
-      if(nextStart) {
-        nextCommand = JsNgram.showLinkToNext(isPerfection, selector, doc, nextStart);
-      } else if(isPerfection) {
-        nextCommand = JsNgram.showLinkToNext(false, JsNgram.resultSelector, null, 0);
-      } else {
-        return;
-      }
-      $.when.apply($, deferred).always(nextCommand);
-      // this comes to work with the redundant when block in 'loadFullText'.
-    //}));
+  function showPage(isPerfection, selector, doc, start, limit) {
+    var pager = JsNgram.showFound(isPerfection, selector, doc, start, limit);
+    var deferred = pager.deferred;
+    var nextStart = pager.next;
+    var nextCommand;
+    if(nextStart) {
+      nextCommand = JsNgram.showLinkToNext(isPerfection, selector, doc, nextStart, JsNgram.outputLimiter);
+    } else if(isPerfection && !doc) {
+      nextCommand = JsNgram.showLinkToNext(false, JsNgram.resultSelector, null, 0, JsNgram.outputLimiter);
+    } else {
+      return;
+    }
+    $.when.apply($, deferred).always(nextCommand);
+    // this comes to work with the redundant when block in 'loadFullText'.
   }
   this.showPage = showPage;
   
   /*############
-  Method: sortFoundByDocument(found)
-    rebuild found as document sorted, as same as perfection.
+  Method: sortFoundByDocumentPosition(found)
+    rebuild found as document, position sorted, as same as perfection.
   ############*/
   
-  function sortFoundByDocument(found) {
+  function sortFoundByDocumentPosition(found) {
     var bag = {};
     var ids = Object.keys(found);
     for(var i = 0; i < ids.length; i++) { // loop by document
@@ -733,11 +834,11 @@ var JsNgram = new function(){
           newF2.push([pos, text]);
         }
       }
-      bag[docId] = newF2;
+      bag[docId] = newF2.sort();
     }
     return(bag);
   }
-  this.sortFoundByDocument = sortFoundByDocument;
+  this.sortFoundByDocumentPosition = sortFoundByDocumentPosition;
   
   /*############
   Method: sortResultsByLocation(results)
@@ -798,7 +899,7 @@ var JsNgram = new function(){
     log.v1(JSON.stringify(perfection));
     
     work['result']['perfection'] = perfection;
-    work['result']['found'] = JsNgram.sortFoundByDocument(found);
+    work['result']['found'] = JsNgram.sortFoundByDocumentPosition(found);
     
     var hits = work.result.hits;
     JsNgram.showResultMessage(hits.perfection);
@@ -806,7 +907,7 @@ var JsNgram = new function(){
     log.v1('Found:', JsNgram.sprintf(JsNgram.resultCount, hits.found));
     
     $.when(JsNgram.loadHeader()).done(function(){
-      JsNgram.showPage(true, JsNgram.resultSelector, null, 0);
+      JsNgram.showPage(true, JsNgram.resultSelector, null, 0, JsNgram.outputLimiter);
     });
   }
   this.whenSearchRequestDone = whenSearchRequestDone;
