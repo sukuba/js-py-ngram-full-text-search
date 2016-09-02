@@ -1,6 +1,14 @@
+// example using JsNgram
+// https://github.com/sukuba/js-py-ngram-full-text-search
+
 /* hilight */
 b {
   background-color: yellow;
+}
+
+/* textbox */
+#q {
+  width: 20rem;
 }
 
 /* minimum required styles */
@@ -16,14 +24,15 @@ body {
 }
 
 /* condensed header */
-main header {
+#console {
   display: flex;
-  justify-content: center;
+  justify-content: left;
+  align-items: center;
   padding: 0.6rem 0 0.6rem 0;
-  background-color: lightgray;
+  background-color: #ecf2d9;
 }
-main header h2 {
-  margin-right: 1rem;
+#console div, #console header, #console form {
+  margin-left: 0.6rem;
 }
 
 /* readability */
@@ -31,30 +40,40 @@ h1, h2, h3, option {
   font-size: 1rem;
   margin: 0;
 }
-.hit, .ui, .doc, .head {
-  border-bottom: 0.1rem solid silver;
-}
-.hit {
-  display: flex;
-}
-/*
-.hit span {
-  display: block;
-}
-*/
-.hit :nth-child(1) {
-  width:10%;
-}
-.hit :nth-child(2) {
-  width:10%;
-}
-.hit :nth-child(3) {
-  width:20%;
-}
-.hit :nth-child(4) {
-  width:60%;
+span {
+  line-height: 1.4rem;
 }
 
+/* lines and layout of result table */
+.ui, .doc, .head {
+  border-bottom: 0.1rem solid silver;
+}
+.hit, .doc .ui {
+  border-top: 0.08rem dashed silver;
+  border-bottom: none;
+}
+.doc {
+  margin: 1rem;
+}
+.info {
+  margin-bottom: 1rem;
+}
+.hit {
+  margin-left: 1rem;
+}
+.ui {
+  margin-left: 1rem;
+}
+.hit span:last-child {
+  color: gray;
+}
+.hit span:last-child:before {
+  content: "@";
+  margin-left: 1rem;
+  margin-right: 0.5rem;
+}
+
+/* miscellaneous */
 #error {
   color: crimson;
 }
@@ -71,27 +90,19 @@ a:hover {
 }
 
 /* responsible format */
-/* for larger screen, such as pc */
-th, td {
-  padding: 0.6rem;
-}
-#console {
-  display: flex;
-}
-#console div, #console header, #console form {
-  margin-left: 0.6rem;
-}
 /* for smaller screen, such as mobile */
 @media only screen and (max-width: 639px) {
-  th, td {
-    display: block;
-    padding: 0;
-  }
   #console {
     display: inline;
   }
   #console div, #console header, #console form {
-    margin-right: 0;
+    margin: 0;
+  }
+  .doc, .info, .hit, .ui {
+    margin: 0;
+  }
+  #q {
+    width: 96%;
   }
 }
 /* for paper print */
