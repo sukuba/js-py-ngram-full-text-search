@@ -193,13 +193,14 @@ var JsNgram = new function(){
     sub functions:
       header: generate table headers.
       content: generate table contents of hit.
+      title: generate table contents of doc info.
       docbox: generate table contents of doc.
   ############*/
   
   this.makeResultHtml = {
     'header': function(){
       var data = [
-        'Word', 'Url', 'Position', 'Content'
+        ''
       ];
       var tr = [];
       tr.push('<div class="head"><span>');
@@ -468,10 +469,10 @@ var JsNgram = new function(){
       $.ajax(this.fulltextFileName(docId), this.ajaxText).done(function(result){
         var x = hilightFn(result, pos, hiLen, outLen);
         //selector.append(contentFn([tag, esc(docId), pos, x]));
-        selector.append(contentFn([pos, x]));
+        selector.append(contentFn([x, pos+1]));
       }).fail(function(xhr, ajaxOptions, thrownError){
         //selector.append(contentFn([tag, esc(docId), pos, _blankText]));
-        selector.append(contentFn([pos, _blankText]));
+        selector.append(contentFn([_blankText, pos+1]));
       })
     ));
   }
