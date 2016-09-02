@@ -30,6 +30,7 @@ var JsNgram = new function(){
     errorSelector: JQuery selector pointing error message box.
     ajaxJson: JQuery ajax settings for json.
     ajaxText: JQuery ajax settings for text.
+    titleInfo: document information data such as title, authors and so on.
     work: structured data shared between callbacks while searching.
     verbose: level of verbosity to show debug information on console.
    * message constants
@@ -69,6 +70,7 @@ var JsNgram = new function(){
     "askToShowNextDocs": { value: 'More documents after %% ... ', writable: true, configurable: true }, 
     "askToShowNextHits": { value: '+ More hits after %% ... ', writable: true, configurable: true }, 
     "partialMatches": { value: '(partial matches)', writable: true, configurable: true }, 
+    "titleInfo": { value: {}, writable: true, configurable: true }, 
     "work": { value: {}, writable: true, configurable: true }, 
     "verbose": { get: function(){ return _verbose; },
                  set: function(verbose){
@@ -190,8 +192,8 @@ var JsNgram = new function(){
     generate html for result.
     sub functions:
       header: generate table headers.
-      content: generate table contents.
-      columns: number of columns.
+      content: generate table contents of hit.
+      docbox: generate table contents of doc.
   ############*/
   
   this.makeResultHtml = {
@@ -208,6 +210,18 @@ var JsNgram = new function(){
     'content': function(data){
       var tr = [];
       tr.push('<div class="hit"><span>');
+      tr.push(data.join('</span><span>'));
+      tr.push('</span></div>');
+      return(tr.join(_blankText));
+    },
+    'title': function(url, title, data){
+      var tr = [];
+      tr.push('<div class="info"><span>');
+      tr.push('<a href="');
+      tr.push(url);
+      tr.push('" target="_blank">');
+      tr.push(title);
+      tr.push('</a>');
       tr.push(data.join('</span><span>'));
       tr.push('</span></div>');
       return(tr.join(_blankText));
@@ -453,13 +467,34 @@ var JsNgram = new function(){
     return($.when(
       $.ajax(this.fulltextFileName(docId), this.ajaxText).done(function(result){
         var x = hilightFn(result, pos, hiLen, outLen);
-        selector.append(contentFn([tag, esc(docId), pos, x]));
+        //selector.append(contentFn([tag, esc(docId), pos, x]));
+        selector.append(contentFn([pos, x]));
       }).fail(function(xhr, ajaxOptions, thrownError){
-        selector.append(contentFn([tag, esc(docId), pos, _blankText]));
+        //selector.append(contentFn([tag, esc(docId), pos, _blankText]));
+        selector.append(contentFn([pos, _blankText]));
       })
     ));
   }
   this.loadFullText = loadFullText;
+  
+  /*############
+  Method: loadTitleInfo(selector, docId)
+    show document title at result.
+  ############*/
+  
+  function loadTitleInfo(selector, docId) {
+    var titleFn = this.makeResultHtml.title;
+    var url = this.convertIdToUrl(docId);
+    var info = this.titleInfo[docId];
+    var title = docId;
+    if(info && info.title) {
+      title = info.title;
+    }
+    title = this.escapeHtml(title);
+    
+    return(selector.append(titleFn(url, title, [])));
+  }
+  this.loadTitleInfo = loadTitleInfo;
   
   /*############
   Method: loadHeader()
@@ -473,6 +508,16 @@ var JsNgram = new function(){
     return(resultSelector.append(headerFn()));
   }
   this.loadHeader = loadHeader;
+  
+  /*############
+  Method: convertIdToUrl(docId)
+    convert docId to URL.
+  ############*/
+  
+  function convertIdToUrl(docId) {
+    return(encodeURI(docId));
+  }
+  this.convertIdToUrl = convertIdToUrl;
   
   /*############
   Method: findPerfection(x, n)
@@ -761,8 +806,10 @@ var JsNgram = new function(){
       var docSelector = $(this.makeResultHtml.docbox());
       
       deferred.push($.when(selector.append(docSelector)).done(function(){
-        JsNgram.log.v2('into hits: ', docId);
-        JsNgram.showPage(isPerfection, docSelector, docId, 0, JsNgram.outputLimiter1st);
+        $.when(JsNgram.loadTitleInfo(docSelector, docId)).done(function(){
+          JsNgram.log.v2('into hits: ', docId);
+          JsNgram.showPage(isPerfection, docSelector, docId, 0, JsNgram.outputLimiter1st);
+        });
       }));
     }
     
