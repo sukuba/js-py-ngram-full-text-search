@@ -518,7 +518,7 @@ var JsNgram = new function(){
   ############*/
   
   function convertIdToUrl(docId) {
-    return(encodeURI(docId));
+    return(encodeURI(this.fulltextFileName(docId)));
   }
   this.convertIdToUrl = convertIdToUrl;
   
