@@ -309,7 +309,9 @@ var JsNgram = new function(){
     escape html special characters.
   ############*/
   
-  var escHtmlFrom = new RegExp(/[&<>"'`]/, 'g');
+  //var escHtmlFrom = new RegExp(/[&<>"'`]/, 'g');
+  // safari: Cannot supply flags when constructing one RegExp from another.
+  var escHtmlFrom = /[&<>"'`]/g;
   var escHtmlTo = {
     '&': '&amp;',
     '<': '&lt;',
