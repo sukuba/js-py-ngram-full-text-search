@@ -26,6 +26,7 @@ var JsNgram = new function(){
     previewSize: text length shown as preview; see LoadFullText and makeTextHilighted.
     outputLimiter: doc or hit counts shown at once.
     outputLimiter1st: hit counts shown at the 1st time with doc.
+    linkAttributes: additional atrributes to document link.
     resultSelector: JQuery selector pointing result wrapper.
     errorSelector: JQuery selector pointing error message box.
     ajaxJson: JQuery ajax settings for json.
@@ -50,6 +51,12 @@ var JsNgram = new function(){
     "previewSize": { value: 240, writable: true, configurable: true }, 
     "outputLimiter": { value: 100, writable: true, configurable: true }, 
     "outputLimiter1st": { value: 1, writable: true, configurable: true }, 
+    "linkAttributes": { value: {
+                          target: '_blank',
+                          type: 'text/plain'
+                          // html5 doesn't support charset
+                        }, 
+                        writable: true, configurable: true }, 
     "resultSelector": { value: undefined, writable: true, configurable: true }, 
     "errorSelector": { value: undefined, writable: true, configurable: true }, 
     "ajaxJson": { value: {
@@ -188,6 +195,33 @@ var JsNgram = new function(){
   this.clearSearchResult = clearSearchResult;
   
   /*############
+  Method: makeHtmlLink(url, title)
+    generate a tag for document link.
+  ############*/
+  
+  function makeHtmlLink(url, title) {
+    var tr = [];
+    tr.push('<a href="');
+    tr.push(url);
+    tr.push('"');
+    var attr = this.linkAttributes;
+    var key = Object.keys(attr);
+    for(var i = 0; i < key.length; i++) {
+      var k = key[i];
+      tr.push(' ');
+      tr.push(k);
+      tr.push('="');
+      tr.push(attr[k]);
+      tr.push('"');
+    }
+    tr.push('>');
+    tr.push(title);
+    tr.push('</a>');
+    return(tr.join(_blankText));
+  }
+  this.makeHtmlLink = makeHtmlLink;
+  
+  /*############
   Method: makeResultHtml
     generate html for result.
     sub functions:
@@ -218,11 +252,7 @@ var JsNgram = new function(){
     'title': function(url, title, data){
       var tr = [];
       tr.push('<div class="info"><span>');
-      tr.push('<a href="');
-      tr.push(url);
-      tr.push('" target="_blank">');
-      tr.push(title);
-      tr.push('</a>');
+      tr.push(JsNgram.makeHtmlLink(url, title));
       tr.push(data.join('</span><span>'));
       tr.push('</span></div>');
       return(tr.join(_blankText));
@@ -518,9 +548,16 @@ var JsNgram = new function(){
   ############*/
   
   function convertIdToUrl(docId) {
-    return(encodeURI(this.fulltextFileName(docId)));
+    return(this.encodeURI(this.fulltextFileName(docId)));
   }
   this.convertIdToUrl = convertIdToUrl;
+  
+  /*############
+  Method: encodeURI(uri)
+    escape uri string.
+  ############*/
+  
+  this.encodeURI = encodeURI;
   
   /*############
   Method: findPerfection(x, n)
