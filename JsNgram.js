@@ -53,8 +53,10 @@ var JsNgram = new function(){
     "outputLimiter1st": { value: 1, writable: true, configurable: true }, 
     "linkAttributes": { value: {
                           target: '_blank',
-                          type: 'text/plain'
-                          // html5 doesn't support charset
+                          type: 'text/plain; charset=utf-8'
+                          // unfortunately, safari doesn't use above advisory,
+                          // but hoping it does in the future.
+                          // also, html5 doesn't support charset attribute.
                         }, 
                         writable: true, configurable: true }, 
     "resultSelector": { value: undefined, writable: true, configurable: true }, 
