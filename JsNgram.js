@@ -151,6 +151,16 @@ var JsNgram = new function(){
   this.showErrorMessage = showErrorMessage;
   
   /*############
+  Method: appendErrorMessage(msg)
+    append content of error box with msg.
+  ############*/
+  
+  function appendErrorMessage(msg) {
+    this.errorSelector.append(msg);
+  }
+  this.appendErrorMessage = appendErrorMessage;
+  
+  /*############
   Method: showOnSearchMessage()
     show progress message on error box.
   ############*/
@@ -234,13 +244,11 @@ var JsNgram = new function(){
   ############*/
   
   this.makeResultHtml = {
-    'header': function(){
-      var data = [
-        ''
-      ];
+    'header': function(data){
+      var headers = (Array.isArray(data) ? data : [data]).join('</span><span>');
       var tr = [];
       tr.push('<div class="head"><span>');
-      tr.push(data.join('</span><span>'));
+      tr.push(headers);
       tr.push('</span></div>');
       return(tr.join(_blankText));
     },
@@ -532,15 +540,15 @@ var JsNgram = new function(){
   this.loadTitleInfo = loadTitleInfo;
   
   /*############
-  Method: loadHeader()
+  Method: loadHeader(arr)
     show header at result.
   ############*/
   
-  function loadHeader() {
+  function loadHeader(arr) {
     var headerFn = this.makeResultHtml.header;
     var resultSelector = this.resultSelector;
     
-    return(resultSelector.append(headerFn()));
+    return(resultSelector.append(headerFn(arr)));
   }
   this.loadHeader = loadHeader;
   
