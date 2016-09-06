@@ -39,7 +39,7 @@ def list_files(path, base=None):
             bag += list_files(fullpath, base)
     return bag;
     
-def apply_files(path, dest, func):
+def apply_files(path, dest, func, exclude_root_files=False):
     """
     scan files in a directory recursively, excluding dot files and dot directories.
     apply 'func' to each file.
@@ -55,7 +55,8 @@ def apply_files(path, dest, func):
             continue  # skip dot files and directories
         fullpath = os.path.join(path, entry)
         if os.path.isfile(fullpath):
-            bag += [(fullpath, dest, func(fullpath, dest))]
+            if not exclude_root_files:
+                bag += [(fullpath, dest, func(fullpath, dest))]
         else:
             next_dest = os.path.join(dest, entry) if dest else None
             bag += apply_files(fullpath, next_dest, func)
@@ -73,6 +74,9 @@ def test():
     
     out_dir = os.path.join(base_dir, 'hoge3')
     ret = apply_files(target, out_dir, myfunc)
+    print(ret)
+    
+    ret = apply_files(target, None, myfunc, True)
     print(ret)
     
 
