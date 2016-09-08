@@ -77,6 +77,10 @@ span {
   display: flex;
   justify-content: space-around;
 }
+.info {
+  display: flex;
+  justify-content: space-between;
+}
 
 /* miscellaneous */
 #error {
@@ -103,8 +107,17 @@ a:hover {
   #console div, #console header, #console form {
     margin: 0;
   }
-  .doc, .info, .hit, .ui {
+  .doc, .head, .info, .hit, .ui {
     margin: 0;
+  }
+  .info, .head {
+    display: block;
+  }
+  .info span {
+    padding-right: 1rem;
+  }
+  .head span {
+    padding-right: 1rem;
   }
   #q {
     width: 96%;

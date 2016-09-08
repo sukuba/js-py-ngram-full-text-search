@@ -263,7 +263,10 @@ var JsNgram = new function(){
       var tr = [];
       tr.push('<div class="info"><span>');
       tr.push(JsNgram.makeHtmlLink(url, title));
-      tr.push(data.join('</span><span>'));
+      if(data.length > 0) {
+        tr.push('</span><span>');
+        tr.push(data.join('</span><span>'));
+      }
       tr.push('</span></div>');
       return(tr.join(_blankText));
     },
