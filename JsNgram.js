@@ -621,13 +621,13 @@ var JsNgram = new function(){
     var texts = [];
     // single character (or shoter than N-gram size) text
     // will not go into this loop.
-    for(var i = 0; i < work['nIter']; i++) {
-      texts.push(work['what'].substr(i, work['nGram']));
+    for(var i = 0; i < work.nIter; i++) {
+      texts.push(work.what.substr(i, work.nGram));
     }
     
     // for a short word
-    if(work['nWhat'] < work['nGram']) {
-      texts.push(work['what']);
+    if(work.nWhat < work.nGram) {
+      texts.push(work.what);
       _my.log.v1('adjusted: ', texts);
     }
     return(texts);
@@ -641,8 +641,8 @@ var JsNgram = new function(){
   
   function generateDeferred(work) {
     var deferred = [];
-    for(var i = 0; i < work['nText']; i++) {
-      deferred.push(_my.loadIndexFile(work['texts'][i]));
+    for(var i = 0; i < work.nText; i++) {
+      deferred.push(_my.loadIndexFile(work.texts[i]));
     }
     return(deferred);
   }
@@ -893,7 +893,7 @@ var JsNgram = new function(){
     var work = _my.work;
     
     // adjust nesting level when length equals 1.
-    var results = (work['deferred'].length > 1) ? arguments : [arguments];
+    var results = (work.deferred.length > 1) ? arguments : [arguments];
     log.v1('whole: ', results.length, results);
     
     var found = _my.sortResultsByLocation(results);
@@ -902,8 +902,8 @@ var JsNgram = new function(){
     var perfection = _my.findPerfection(found, work.nText);
     log.v1(JSON.stringify(perfection));
     
-    work['result']['perfection'] = perfection;
-    work['result']['found'] = _my.sortFoundByDocumentPosition(found);
+    work.result['perfection'] = perfection;
+    work.result['found'] = _my.sortFoundByDocumentPosition(found);
     
     var hits = work.result.hits;
     _my.showResultMessage(hits.perfection);
