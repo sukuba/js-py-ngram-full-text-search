@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Online Demo - js-py-ngram-full-text-search</title>
+  <script src="jquery-3.1.0.min.js"></script>
+  <script src="../../JsNgram.js"></script>
+  <script src="search.js"></script>
+  <link rel="stylesheet" href="search.css" />
+  <link rel="stylesheet" href="../thema.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body>
+
+<div id="head">
+  <header>
+    <h1>js-py-ngram-full-text-search</h1>
+    <h2>Online Demo</h2>
+  </header>
+  
+  <nav>
+    <span><a href="../index.html">.. go up</a></span>
+  </nav>
+</div>
+
+<main>
+  <section id="demo">
+    <summary>demo</summary>
+    <div id="demobox">
+    
+<div id="console">
+  <header><h1>Input a word and hit search button.</h1></header>
+  <form>
+    <input type="text" id="q" value="alice" />
+    <button type="button" id="search">Search</button>
+  </form>
+  <div id="error"></div>
+</div>
+<div id="result"></div>
+    
+    </div>
+    <p>demo screen ends.</p>
+  </section>
+  <section>
+    <summary>hint</summary>
+    <p>
+Contents used in above search are two short quotes from Alice's Adventures in Wonderland by Lewis Carroll.  So, "alice" is not a bad choice to search at first.
+    </p>
+  </section>
+  <section>
+    <summary>contents on search</summary>
+    <ol>
+      <li>
+        <a href="txt/Alice-in-Wonderland.txt" target="_blank">
+txt/Alice-in-Wonderland.txt
+        </a>
+      </li>
+      <li>
+        <a href="txt/Lewis-Carroll.txt" target="_blank">
+txt/Lewis-Carroll.txt
+        </a>
+      </li>
+    </ol>
+  </section>
+  <section>
+    <summary>indexes generated</summary>
+    <p>Index files are formated as json.  Followings are these index files genarated for the above two contents.  
+    <ol id="idx">
+    </ol>
+  </section>
+  <section>
+    <summary>howto make indexes work</summary>
+    <ol>
+      <li>
+Open a console and locate at the folder <code>js-py-ngram-full-text-search</code>.
+      </li>
+      <li>
+Place content files in a folder <code>txt</code>.
+      </li>
+      <li>
+Make a blank folder <code>idx</code>.
+      </li>
+      <li>
+Run <code>python test4-jsngram.py</code>.
+      </li>
+      <li>
+Files are created in <code>idx</code>.
+      </li>
+      <li>
+Download <code>jquery-3.1.0.min.js</code> from JQuery web site.  Another version can work, just changing the script link uri in html file.
+      </li>
+      <li>
+Open <code>example1-JsNgram.html</code> with your <code>FireFox</code> or <code>Safari</code>.
+      </li>
+      <li>
+Try search and fun:)
+      </li>
+    </ol>
+  </section>
+</main>
+
+<footer>
+  <span><a href="../index.html">.. go up</a></span>
+  <span><a href="https://github.com/sukuba/js-py-ngram-full-text-search" target="_blank">sources are available at github. </a></span>
+</footer>
+</body>
+</html>

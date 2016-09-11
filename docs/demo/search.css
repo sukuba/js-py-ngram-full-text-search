@@ -1,0 +1,132 @@
+/* example using JsNgram
+// https://github.com/sukuba/js-py-ngram-full-text-search
+*/
+
+/* hilight */
+b {
+  background-color: yellow;
+}
+
+/* textbox */
+#q {
+  width: 20rem;
+}
+
+/* minimum required styles */
+
+/* html5 section tags */
+header, footer, main {
+  display: block;
+}
+
+/* remove outmost margins */
+body {
+  margin: 0px;
+}
+
+/* condensed header */
+#console {
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  padding: 0.6rem 0 0.6rem 0;
+  background-color: #ecf2d9;
+}
+#console div, #console header, #console form {
+  margin-left: 0.6rem;
+}
+
+/* readability */
+h1, h2, h3, option {
+  font-size: 1rem;
+  margin: 0;
+}
+span {
+  line-height: 1.4rem;
+}
+
+/* lines and layout of result table */
+.ui, .doc, .head {
+  border-bottom: 0.1rem solid silver;
+}
+.hit, .doc .ui {
+  border-top: 0.08rem dashed silver;
+  border-bottom: none;
+}
+.doc {
+  margin: 1rem;
+}
+.info {
+  margin-bottom: 1rem;
+}
+.hit {
+  margin-left: 1rem;
+}
+.ui {
+  margin-left: 1rem;
+}
+.hit span:last-child {
+  color: gray;
+}
+.hit span:last-child:before {
+  content: "@";
+  margin-left: 1rem;
+  margin-right: 0.5rem;
+}
+.head {
+  display: flex;
+  justify-content: space-around;
+}
+.info {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* miscellaneous */
+#error {
+  color: crimson;
+}
+footer {
+  margin-top: 1rem;
+  padding-right: 0.6rem;
+  text-align: right;
+}
+a {
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+/* responsible format */
+/* for smaller screen, such as mobile */
+@media only screen and (max-width: 639px) {
+  #console {
+    display: inline;
+  }
+  #console div, #console header, #console form {
+    margin: 0;
+  }
+  .doc, .head, .info, .hit, .ui {
+    margin: 0;
+  }
+  .info, .head {
+    display: block;
+  }
+  .info span {
+    padding-right: 1rem;
+  }
+  .head span {
+    padding-right: 1rem;
+  }
+  #q {
+    width: 96%;
+  }
+}
+/* for paper print */
+@media print {
+  main header {
+    background-color: white;
+  }
+}
+

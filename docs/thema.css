@@ -1,0 +1,127 @@
+/* full text search using JsNgram
+// https://github.com/sukuba/js-py-ngram-full-text-search
+// https://github.com/sukuba/js-py-document-search
+*/
+
+/* minimum required styles */
+
+/* html5 section tags */
+header, footer, main, nav, section, details, summary {
+  display: block;
+}
+
+/* readability */
+h1, h3 {
+  font-size: 1rem;
+  margin: 0;
+}
+h2 {
+  font-size: 1.8rem;
+  margin: 0;
+}
+span, p, summary, h3 {
+  line-height: 2.1rem;
+}
+main {
+  margin-top: 1rem;
+}
+footer {
+  margin-top: 1rem;
+  text-align: right;
+}
+footer span:after {
+  content: ",";
+  margin-right: 0.5rem;
+}
+footer span:last-child:after {
+  content: none;
+  margin-right: 0;
+}
+a {
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+  background-color: #ffff99;
+}
+summary:hover {
+  text-decoration: underline;
+  color: blue;
+  background-color: #ffff99;
+}
+
+/* header and nav */
+#head {
+  display: flex;
+  justify-content: space-between;
+}
+nav span {
+  display: block;
+}
+nav span a {
+  display: inline-block;
+  width: 100%;
+}
+
+/* decoration */
+h1 {
+  color: #444444;
+  text-shadow: 1px 1px 2px #ffff66, 0 0 25px #ffbf80, 0 0 5px #ff66ff;
+}
+h2 {
+  color: #001a00;
+  text-shadow: 1px 1px 2px #ffff66, 0 0 25px #66ff99;
+}
+h3 {
+  text-shadow: 1px 1px 2px #ffff66;
+  margin-left: 5rem;
+}
+summary {
+  text-shadow: 1px 1px 2px #ffff66;
+}
+details {
+  border-top: 0.1rem solid silver;
+  margin-left: 1rem;
+}
+
+/* responsible format */
+/* for smaller screen, such as mobile */
+@media only screen and (max-width: 639px) {
+  #head {
+    display: block;
+  }
+  h1 {
+    text-align: right;
+  }
+  h2 {
+    font-size: 1rem;
+  }
+  h3, details {
+      margin: 0;
+  }
+  ul, ol {
+    list-style-position: inside;
+    padding: 0;
+  }
+  footer span {
+    display: block;
+  }
+  footer span a {
+    display: inline-block;
+    width: 100%;
+  }
+  footer span:after {
+    content: none;
+    margin-right: 0;
+  }
+}
+/* for paper print */
+@media print {
+  main header {
+    background-color: white;
+  }
+  * {
+    text-shadow: none;
+  }
+}
+
