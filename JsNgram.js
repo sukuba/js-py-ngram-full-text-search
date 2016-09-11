@@ -276,50 +276,6 @@ var JsNgram = new function(){
     }
   };
   
-  /*
-  this.makeResultHtml = {
-    'header': function(){
-      var data = [
-        'Word', 'Url', 'Position', 'Content'
-      ];
-      var tr = [];
-      tr.push('<tr><th>');
-      tr.push(data.join('</th><th>'));
-      tr.push('</th></tr>');
-      return(tr.join(_blankText));
-    },
-    'content': function(data){
-      var tr = [];
-      tr.push('<tr><td>');
-      tr.push(data.join('</td><td>'));
-      tr.push('</td></tr>');
-      return(tr.join(_blankText));
-    },
-    'columns': 4
-  };
-  */
-  
-  /*############
-  Method: makeLinkToFound()
-    generate html for result.
-    OBSOLETE; now using makeLinkToNext to support pager
-  ############*/
-  
-  function makeLinkToFound() {
-    var colNum = _my.makeResultHtml.columns;
-    return($('<tr></tr>').append(
-      $('<td colspan="' + colNum + '"></td>').append(
-        $('<button type="button"></button>').append(
-          _my.askToShowFound
-        ).on('click', function(){
-          this.disabled = true;
-          _my.showFound(_my.work.result.found, _my.resultSelector, null, 0);
-        })
-      )
-    ));
-  }
-  _my.makeLinkToFound = makeLinkToFound;
-  
   /*############
   Method: makeLinkToNext(isPerfection, selector, doc, start, limit)
     generate html for result.
@@ -693,17 +649,6 @@ var JsNgram = new function(){
   _my.generateDeferred = generateDeferred;
   
   /*############
-  Method: showLinkToFound()
-    privide a link to show found.
-    OBSOLETE; now using showLinkToNext to support pager
-  ############*/
-  
-  function showLinkToFound() {
-    _my.resultSelector.append(_my.makeLinkToFound());
-  }
-  _my.showLinkToFound = showLinkToFound;
-  
-  /*############
   Method: showLinkToNext(isPerfection, selector, doc, start, limit)
     privide a link to show found.
   ############*/
@@ -723,10 +668,11 @@ var JsNgram = new function(){
     but the browser will crash when given a lot of data (too many uses of ajax).
   ############*/
   
-  function showFoundUnlimited(perfection) {
+  function showFoundUnlimited(isPerfection, selector) {
+    var perfection = isPerfection ? _my.work.result.perfection : _my.work.result.found;
     var ids = Object.keys(perfection);
     var n = ids.length;
-    _my.log.v1('showFound: ', n);
+    _my.log.v1('showFoundUnlimited: ', n);
     
     var what = _my.work.what;
     
@@ -735,49 +681,6 @@ var JsNgram = new function(){
       var docId = ids[i];
       var poss = perfection[docId];
       for(var k = 0; k < poss.length; k++) {
-        var val = poss[k];
-        var pos = val[0];
-        var text = val[1];
-        if(!text) {
-          text = what;
-        }
-        var hiLen = text.length;
-        deferred.push(_my.loadFullText(_my.resultSelector, docId, pos, hiLen, text));
-      }
-    }
-    return(deferred);
-  }
-  
-  /*############
-  Method: showFoundAllHits(perfection, selector, doc, start)
-    OBSOLETE version of showFound, that shows results by hit.
-    show found result. both for perfection and found (partial match).
-    selector: resultSelector
-    doc: null or docId
-    start: number to skip records
-  ############*/
-  
-  function showFoundAllHits(perfection, selector, doc, start) {
-    var ids = Object.keys(perfection);
-    var n = ids.length;
-    _my.log.v1('showFound: ', n);
-    
-    var what = _my.work.what;
-    var limit = _my.outputLimiter + start;
-    var counter = 0;
-    
-    var deferred = [];
-    for(var i = 0; i < ids.length; i++) { // loop by document
-      var docId = ids[i];
-      var poss = perfection[docId];
-      for(var k = 0; k < poss.length; k++) {
-        if(counter++ < start) {
-          continue;
-        }
-        if(counter > limit) {
-          _my.log.v1('limit: ', start, counter, i, k);
-          return({'deferred':deferred, 'next':limit});
-        }
         var val = poss[k];
         var pos = val[0];
         var text = val[1];
@@ -788,7 +691,7 @@ var JsNgram = new function(){
         deferred.push(_my.loadFullText(selector, docId, pos, hiLen, text));
       }
     }
-    return({'deferred':deferred});
+    return(deferred);
   }
   
   /*############
