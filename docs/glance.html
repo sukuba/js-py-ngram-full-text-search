@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>At a glance - js-py-ngram-full-text-search</title>
+  <link rel="stylesheet" href="thema.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body>
+
+<div id="head">
+  <header>
+    <h1>js-py-ngram-full-text-search</h1>
+    <h2>At a glance</h2>
+  </header>
+  
+  <nav>
+    <span><a href="demo/index.html">online demo</a></span>
+    <span><a href="../index.html">.. go up</a></span>
+    <span><a href="./index.html">. go index</a></span>
+  </nav>
+</div>
+
+<main>
+  <svg width="100%" viewbox="0 64 1280 900">
+    <defs>
+      <g>
+        <symbol id="arrow-head">
+          <polyline id="pol1" points="32 128 96 32 160 128" stroke-width="32" stroke-opacity="1" fill-opacity="0" />
+        </symbol>
+        <symbol id="round-path">
+          <circle id="cir1" cx="512", cy="512" r="256" stroke-width="32" stroke-opacity="1" fill-opacity="0" />
+        </symbol>
+        <symbol id="folder-box">
+          <rect id="box1" rx="16" ry="16" width="192" height="128" x="8", y="8" stroke-width="8" />
+          <use xlink:href="#box1" x="16", y="16" />
+        </symbol>
+        <symbol id="operation-box">
+          <rect id="box2" rx="64" ry="64" width="192" height="192" x="8", y="8" stroke-width="8" />
+        </symbol>
+        <symbol id="domain-box">
+          <rect id="box3" width="896" height="512" x="16", y="16" stroke-width="16" stroke-opacity="0.3" fill-opacity="0.1" />
+        </symbol>
+      </g>
+    </defs>
+    
+    <use xlink:href="#round-path" x="0", y="0" stroke="#668cff" />
+    <use xlink:href="#arrow-head" x="370", y="180" stroke="#668cff" transform="rotate(53 370 180)" />
+    <use xlink:href="#arrow-head" x="535", y="332" stroke="#668cff" transform="rotate(-53 535 332)" />
+    <use xlink:href="#arrow-head" x="160", y="580" stroke="#668cff" transform="rotate(337 160 580)" />
+    
+    <use xlink:href="#domain-box" x="0", y="400" stroke="#ff8c66" fill="#ff8c66" />
+    <text x="42" y="910" font-size="32" text-anchor="start" fill="#661a00">
+builder side (maintainer)
+    </text>
+    
+    <use xlink:href="#domain-box" x="102", y="96" stroke="#8cff66" fill="#8cff66" />
+    <text x="996" y="156" font-size="32" text-anchor="end" fill="#006600">
+client side (end user)
+    </text>
+    
+    <use xlink:href="#folder-box" x="152", y="440" stroke="#ff66ff" fill="white" />
+    <text x="280" y="520" font-size="32" text-anchor="middle" fill="#660066">
+N-gram index files
+    </text>
+    <text x="280" y="560" font-size="32" text-anchor="middle" fill="#660066">
+(json)
+    </text>
+    
+    <use xlink:href="#folder-box" x="664", y="440" stroke="#8c66ff" fill="white" />
+    <text x="780" y="520" font-size="32" text-anchor="middle" fill="#1a0066">
+Text files
+    </text>
+    <text x="780" y="560" font-size="32" text-anchor="middle" fill="#1a0066">
+(to be searched)
+    </text>
+    
+    <use xlink:href="#operation-box" x="408", y="152" stroke="#8cff66" fill="white" />
+    <text x="512" y="222" font-size="48" text-anchor="middle" fill="black">
+Modern browser
+    </text>
+    <text x="512" y="252" font-size="32" text-anchor="middle" fill="black">
+(FireFox, Safari, )
+    </text>
+    <text x="512" y="300" font-size="32" text-anchor="middle" fill="black">
+uses index to search text
+    </text>
+    
+    <use xlink:href="#operation-box" x="408", y="664" stroke="#ff8c66" fill="white" />
+    <text x="512" y="756" font-size="48" text-anchor="middle" fill="black">
+Python backend
+    </text>
+    <text x="512" y="804" font-size="32" text-anchor="middle" fill="black">
+generates index from text
+    </text>
+    
+  </svg>
+</main>
+
+<footer>
+  <span><a href="demo/index.html">online demo</a></span>
+  <span><a href="../index.html">.. go up</a></span>
+  <span><a href="./index.html">. go index</a></span>
+  <span><a href="https://github.com/sukuba/js-py-ngram-full-text-search" target="_blank">sources are available at github. </a></span>
+</footer>
+</body>
+</html>

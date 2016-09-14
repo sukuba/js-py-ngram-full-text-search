@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>JsNgram.ignore js-py-ngram-full-text-search</title>
+  <link rel="stylesheet" href="../../thema.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body>
+
+<div id="head">
+  <header>
+    <h1>js-py-ngram-full-text-search</h1>
+    <h2>JsNgram.ignore</h2>
+  </header>
+  
+  <nav>
+    <span><a href="../index.html">.. Reference</a></span>
+    <span><a href="./index.html">. JsNgram class</a></span>
+  </nav>
+</div>
+
+<main>
+  <section>
+    <h3>property of class JsNgram</h3>
+    <details>
+      <summary>Description</summary>
+      <p>
+Define the word delimiters those are excluded from indexes.
+      </p>
+    </details>
+    <details>
+      <summary>Example</summary>
+      <pre>
+self.ignore = r'\s+'
+      </pre>
+    </details>
+    <details>
+      <summary>Default value</summary>
+      <pre>
+r'[\s,.，．、。]+'
+      </pre>
+      <p>
+Spaces, tabs, line feeds, punctuation marks both in English and Japanese.
+      </p>
+    </details>
+    <details>
+      <summary>Usage</summary>
+      <pre>
+import jsngram.jsngram
+
+# gives at class initializing
+ix = jsngram.jsngram.JsNgram(ignore=r'[\s!-.]+')
+
+# sets property value later
+ix.ignore = r'[\s!-.]+'
+      </pre>
+      <ul>
+        <li>
+The value must be a valid regular expression pattern string.
+        </li>
+        <li>
+Non string values like <code>None</code> are prohibited.
+        </li>
+      </ul>
+    </details>
+    
+  </section>
+  <section>
+    <h3>more examples</h3>
+    <details>
+      <summary>Including periods and spaces to the index</summary>
+      <pre>
+r'[\f\n\r\t\v]+'
+      </pre>
+      <p>
+Form feed ,line feed, carriage return, horizontal and vertical tabs.
+      </p>
+    </details>
+    <details>
+      <summary>Including everything into the index</summary>
+      <pre>
+r'[^\s\S]+'
+      </pre>
+      <p>
+Technically, this regular expression matches none.
+      </p>
+    </details>
+  </section>
+</main>
+
+<footer>
+  <span><a href="../index.html">.. Reference</a></span>
+  <span><a href="./index.html">. JsNgram class</a></span>
+  <span><a href="https://github.com/sukuba/js-py-ngram-full-text-search" target="_blank">sources are available at github. </a></span>
+</footer>
+</body>
+</html>
