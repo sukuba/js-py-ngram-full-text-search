@@ -19,7 +19,7 @@ h2 {
   font-size: 1.8rem;
   margin: 0;
 }
-span, p, summary, h3 {
+span, p, dt, dd, summary, h3 {
   line-height: 2.1rem;
 }
 main {
@@ -83,6 +83,10 @@ details {
   border-top: 0.1rem solid silver;
   margin-left: 1rem;
 }
+dt {
+  font-weight: bold;
+  text-shadow: 1px 1px 2px #ffff66;
+}
 
 /* responsible format */
 /* for smaller screen, such as mobile */
@@ -96,7 +100,7 @@ details {
   h2 {
     font-size: 1rem;
   }
-  h3, details {
+  h3, details, dd {
       margin: 0;
   }
   ul, ol {
@@ -121,7 +125,7 @@ details {
     background-color: white;
   }
   * {
-    text-shadow: none;
+    text-shadow: none !important;
   }
 }
 
