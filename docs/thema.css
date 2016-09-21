@@ -49,6 +49,9 @@ summary:hover {
   color: blue;
   background-color: #ffff99;
 }
+.line100 {
+  line-height: 1em;
+}
 
 /* header and nav */
 #head {
