@@ -19,7 +19,7 @@ h2 {
   font-size: 1.8rem;
   margin: 0;
 }
-span, p, dt, dd, summary, h3 {
+span, p, dt, dd, li, pre, summary, h3 {
   line-height: 2.1rem;
 }
 main {
