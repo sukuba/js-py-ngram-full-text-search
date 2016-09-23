@@ -28,6 +28,20 @@
 Python built-in json builder
       </summary>
       <p>
+Writing to a text file by <code>json.dump</code> is simple and fast.  
+A problem is an object size (comparing to the physical memory of machine).  
+For smaller amount of texts, it works nicely.  
+But if you want to deal with a large (huge) number of documents, 
+such as the entire documents saved in a terabit drive, 
+the whole index size will excess the physical memory 
+and this way will become terrible.  
+      </p>
+      <p>
+The 
+<code><a href="jsngram/jsngram/to_json.html">
+to_json() method 
+</a></code> 
+uses this.  
       </p>
     </details>
     <details>
@@ -35,6 +49,22 @@ Python built-in json builder
 Recordable json builder
       </summary>
       <p>
+The 
+<code><a href="json2/index.html">
+jsngram.json2 module 
+</a></code> 
+gives an additive way of building a json file.  
+Now, huge number documents are nothing but the time of processing.  
+You can control the number of files to put in a single object, 
+and flush the result after appending to json files.  
+This will prevent the object size from growing too large.  
+      </p>
+      <p>
+The 
+<code><a href="jsngram/jsngram/add_files_to_json.html">
+add_files_to_json() method 
+</a></code> 
+uses this.  
       </p>
     </details>
     <details>
@@ -42,6 +72,18 @@ Recordable json builder
 Differential builder
       </summary>
       <p>
+Rebuilding the index requires large amounts of hours.  
+It would be nice if we had a way of dirrerential updates, 
+when changes of documents were limited.  
+But this way is not implemented yet.  
+      </p>
+      <p>
+Because we already have recordable way as above, 
+the differential way will not be so hard.  
+Just remove old indexes and append new indexes.  
+Or compare them to get minimum changes and modify the json file.  
+Anyway, to remove old indexes, 
+we want to keep previous documents that was used to build old indexes.  
       </p>
     </details>
   </section>

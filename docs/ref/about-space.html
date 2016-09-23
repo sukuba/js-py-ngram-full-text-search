@@ -28,6 +28,15 @@
 Default action
       </summary>
       <p>
+Spaces, tabs, line feeds, punctuation marks both in English and Japanese are marked as delimiters.
+Texts are splitted by delimiters before indexing.  
+So, no keys cross over the delimiter.  
+An adverse effect of this is that "3.14" cannot be searched.  
+      </p>
+      <p>
+For example, "my cat." will be "my", "ca", "at", "m", "y", "c", "a" and "t".  
+While "my cat!" will be "my", "ca", "at", "t!", "m", "y", "c", "a", "t" and "!".  
+And "3.14" will be "3", "14", "1" and "4".  
       </p>
     </details>
     <details>
@@ -35,6 +44,17 @@ Default action
 Customize
       </summary>
       <p>
+The 
+<code><a href="jsngram/jsngram/ignore.html">
+ignore property 
+</a></code> 
+of 
+<code><a href="jsngram/jsngram/index.html">
+jsngram.jsngram.JsNgram class 
+</a></code> 
+controls this behavior.  
+You can add or remove delimiter characters.  
+The system can go even with no delimiters.  
       </p>
     </details>
     <details>
@@ -42,6 +62,12 @@ Customize
 Preparation
       </summary>
       <p>
+If you want to make indexes including spaces or line feeds, 
+some preparations before indexing are recommended.  
+Consecutive spaces are better to be trimmed to one space.  
+Line feeds are better to be unified to one.  
+When the text is something sensitve to these changes, 
+these preprocesses are not appropriate.  
       </p>
     </details>
   </section>

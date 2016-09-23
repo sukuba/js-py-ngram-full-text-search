@@ -28,13 +28,47 @@
 Look-and-feel
       </summary>
       <p>
+As the 
+<a href="../demo/index.html">
+online demo 
+</a> 
+page shows, 
+the results section has three parts.  
+Title, content and button.  
+      </p>
+      <p>
+The title is a path of file with hyperlink.  
+This block is meant to be a file header.  
+      </p>
+      <p>
+The content is a preview text around the match.  
+A string matched is presented with bold font and yellow background color.  
+The location from the beginning of text is shown at the last of this block after "@" with gray color.  
+      </p>
+      <p>
+A button means there're more hits not shown yet.  
+Pushing a button will show some of these hiding hits.  
+The button acts as pager.  
+A page is limitted to 100 hits by default, 
+and a push shows next 100, without removing the older hits.  
+Three types of button are provided.  
+For another hits in same file, for another files, and for partial matches.  
+The "+ More hits after 1 ..." buttons are shown here and there, 
+because only the 1st hit in a same file is shown by default.  
       </p>
     </details>
     <details>
       <summary>
-Partial hit
+Partial match
       </summary>
       <p>
+When you search "cat", 
+the results of matching "cat" are shown.  
+Also matching to "ca" or "at" are shown as partial matches.  
+Pushing the "Want partial matches?" button will show the partial matches.  
+These partial matches are sometime different to the exact mathes to "ca".  
+If "at" is not found when searching "cat", the result is shown as none and
+the partial match button is not shown even if there may be "ca".
       </p>
     </details>
     <details>

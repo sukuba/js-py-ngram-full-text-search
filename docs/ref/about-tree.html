@@ -28,14 +28,36 @@
 Tree
       </summary>
       <p>
+The 
+<code><a href="dir2/index.html">
+jsngram.dir2 package 
+</a></code> 
+gives an easy list of files in a directory tree.  
       </p>
+      <pre>
+ix = jsngram.jsngram.JsNgram()
+# adding from directory "src"
+for file in jsngram.dir2.list_files(src):
+    ix.add_file(file)
+      </pre>
     </details>
     <details>
       <summary>
 List
       </summary>
       <p>
+Explicit list of files can also be used instead of a file tree.  
+List of id-content-pairs can be used instead of files.  
       </p>
+      <pre>
+ix = jsngram.jsngram.JsNgram()
+# adding from file list "files"
+for file in files:
+    ix.add_file(file)
+# adding (id, content) pairs "contents"
+for id, content in contents:
+    ix.add_document(id, content)
+      </pre>
     </details>
   </section>
 </main>
