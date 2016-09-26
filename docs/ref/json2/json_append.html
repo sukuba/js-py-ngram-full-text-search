@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>jsngram.json2.json_append js-py-ngram-full-text-search</title>
+  <link rel="stylesheet" href="../../thema.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body>
+
+<div id="head">
+  <header>
+    <h1>js-py-ngram-full-text-search</h1>
+    <h2>jsngram.json2.json_append</h2>
+  </header>
+  
+  <nav>
+    <span><a href="../index.html">../.. Reference</a></span>
+    <span><a href="./index.html">.. jsngram.json2</a></span>
+  </nav>
+</div>
+
+<main>
+  <section>
+    <h3>function in jsngram.json2 module</h3>
+    <details>
+      <summary>Description</summary>
+      <p>
+Append an object to a existing json file. 
+The file should not have any end brackets 
+and this function doesn't put an end bracket by default. 
+It appends without looking it to get performance instead of flexibility. 
+Creates new file with starting bracket, when the file is not exist. 
+      </p>
+      <p>
+Call 
+<code><a href="json_end.html">json_end</a></code> 
+in this module 
+when you finish the json file. 
+      </p>
+    </details>
+    <details>
+      <summary>Example</summary>
+      <pre>
+jsngram.json2.json_append('/scratch/a.json', 1)
+jsngram.json2.json_append('/scratch/a.json', 2)
+jsngram.json2.json_append('/scratch/a.json', [3,4], list=True)
+jsngram.json2.json_append('/scratch/a.json', 5)
+jsngram.json2.json_end('/scratch/a.json')
+# [1,2,3,4,5]
+
+jsngram.json2.json_append('/tmp/out.json', ['a',0])
+jsngram.json2.json_append('/tmp/out.json', ['b',1])
+jsngram.json2.json_append('/tmp/out.json', ['c',2])
+jsngram.json2.json_end('/tmp/out.json')
+
+"""
+[
+ ['a',0]
+,['b',1]
+,['c',2]
+]
+"""
+      </pre>
+    </details>
+    <details>
+      <summary>Usage</summary>
+      <p>
+jsngram.json2.json_append(<i>file_name</i>, <i>x</i>, <i>list=False</i>, <i>end=False</i>)
+      </p>
+      <p>
+Argument <i>file_name</i> must be a full path to a json file. 
+The <i>x</i> is object that want to append to the json file. 
+Set <i>list</i> = <code>True</code>, 
+if the <i>x</i> is an array and want to add the elements of array instead of array itself. 
+Set <i>end</i> = <code>True</code>, 
+if you want to add an end bracket to close the json file immediately. 
+      </p>
+    </details>
+  </section>
+</main>
+
+<footer>
+  <span><a href="../index.html">../.. Reference</a></span>
+  <span><a href="./index.html">.. jsngram.json2</a></span>
+  <span><a href="https://github.com/sukuba/js-py-ngram-full-text-search" target="_blank">sources are available at github. </a></span>
+</footer>
+</body>
+</html>

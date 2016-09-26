@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>jsngram.text2.normalize_texts js-py-ngram-full-text-search</title>
+  <link rel="stylesheet" href="../../thema.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body>
+
+<div id="head">
+  <header>
+    <h1>js-py-ngram-full-text-search</h1>
+    <h2>jsngram.text2.normalize_texts</h2>
+  </header>
+  
+  <nav>
+    <span><a href="../index.html">../.. Reference</a></span>
+    <span><a href="./index.html">.. jsngram.text2</a></span>
+  </nav>
+</div>
+
+<main>
+  <section>
+    <h3>function in jsngram.text2 module</h3>
+    <details>
+      <summary>Description</summary>
+      <p>
+Normalize a text file or files in a directory including subdirectories. 
+Uses <code>normal_text</code> for Unicode normalization. 
+      </p>
+    </details>
+    <details>
+      <summary>Example</summary>
+      <pre>
+jsngram.text2.normalize_texts('/scratch/a.txt', '/scratch/b.txt')
+jsngram.text2.normalize_texts('/scratch/c', '/scratch/d')
+jsngram.text2.normalize_texts('/scratch/e')
+      </pre>
+    </details>
+    <details>
+      <summary>Usage</summary>
+      <p>
+jsngram.text2.normalize_texts(<i>src</i>, <i>dest=None</i>)
+      </p>
+      <p>
+Normalize text files at <i>src</i> to <i>dest</i>. 
+Argument <i>dest</i> must be a directory when <i>src</i> is a directory. 
+Argument <i>dest</i> is assumed to be a file when <i>src</i> is a file. 
+The <i>src</i> will be overwritten when <i>dest</i> = <code>None</code>. 
+      </p>
+    </details>
+  </section>
+</main>
+
+<footer>
+  <span><a href="../index.html">../.. Reference</a></span>
+  <span><a href="./index.html">.. jsngram.text2</a></span>
+  <span><a href="https://github.com/sukuba/js-py-ngram-full-text-search" target="_blank">sources are available at github. </a></span>
+</footer>
+</body>
+</html>
