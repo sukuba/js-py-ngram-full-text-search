@@ -48,7 +48,7 @@ The location from the beginning of text is shown at the last of this block after
       <p>
 A button means there're more hits not shown yet.  
 Pushing a button will show some of these hiding hits.  
-The button acts as pager.  
+The button acts as a page controler.  
 A page is limitted to 100 hits by default, 
 and a push shows next 100, without removing the older hits.  
 Three types of button are provided.  
@@ -73,10 +73,61 @@ the partial match button is not shown even if there may be "ca".
     </details>
     <details>
       <summary>
+Single word only
+      </summary>
+      <p>
+This library suport only a word for searching at this moment. 
+So, neither of seaching "cat and alice" nor "cat or alice" can not be done. 
+      </p>
+    </details>
+    <details>
+      <summary>
 Html generated
       </summary>
       <p>
+The html structure is as followings by default. 
       </p>
+      <pre>
+&lt;div class="head"&gt;
+  This comes only once at first, showing header informations. 
+  It shows nothing by default. 
+&lt;/div&gt;
+
+&lt;div class="doc"&gt;
+  This contains all hits for a single document. 
+  We will have many of this block. 
+  
+  &lt;div class="info"&gt;
+    This contains header information of the document. 
+    Showing a hyperlink to the text file. 
+  &lt;/div&gt;
+  
+  &lt;div class="hit"&gt;
+    This contains a hit in the document. 
+    A text around the hit is shown 
+    and the word are marked by yellow color. 
+    We will have many of this block. 
+  &lt;/div&gt;
+  
+  &lt;div class="hit"&gt;
+  &lt;/div&gt;
+  
+  &lt;div class="ui"&gt;
+    This block contain a button to show 
+    more hits in the document. 
+  &lt;/div&gt;
+  
+&lt;/div&gt;
+
+&lt;div class="doc"&gt;
+&lt;/div&gt;
+
+&lt;div class="ui"&gt;
+  This block contain a button to show 
+  more documents 
+  or partial matches. 
+&lt;/div&gt;
+      </pre>
     </details>
   </section>
 </main>
