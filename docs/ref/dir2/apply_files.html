@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>jsngram.dir2.apply_files js-py-ngram-full-text-search</title>
+  <link rel="stylesheet" href="../../thema.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body>
+
+<div id="head">
+  <header>
+    <h1>js-py-ngram-full-text-search</h1>
+    <h2>jsngram.dir2.apply_files</h2>
+  </header>
+  
+  <nav>
+    <span><a href="../index.html">../.. Reference</a></span>
+    <span><a href="./index.html">.. jsngram.dir2</a></span>
+  </nav>
+</div>
+
+<main>
+  <section>
+    <h3>function in jsngram.dir2 module</h3>
+    <details>
+      <summary>Description</summary>
+      <p>
+Scan files in a directory recursively, excluding dot files and dot directories. 
+Apply a specified <code>function</code> to each file. 
+      </p>
+    </details>
+    <details>
+      <summary>Example</summary>
+      <pre>
+def myfunc(path, dest):
+    return path
+jsngram.dir2.apply_files('/scratch', None, myfunc, True)
+# [('/scratch/c/d.txt', None, '/scratch/c/d.txt'), 
+#  ('/scratch/c/e.txt', None, '/scratch/c/e.txt')]
+      </pre>
+    </details>
+    <details>
+      <summary>Usage</summary>
+      <p>
+jsngram.dir2.apply_files(<i>path</i>, <i>dest</i>, <i>func</i>, <i>exclude_root_files=False</i>)
+      </p>
+      <p>
+Argument <i>path</i> is a source directory that will be scanned. 
+Argument <i>dest</i> is a destination directory. 
+Argument <i>func</i> is a function with two arguments (full path of a source file, destination directory). 
+Both arguments given to the <i>func</i> are integrated path that will keep consistent position between the source treen and the destination tree. 
+You can use this to convert multiple files 
+with a function that converts file from source to destination. 
+Or use this to get some information from files 
+with a function that returns a summary from a file. 
+Returns a list of three element tuple, that is the source file path, destination and the return value of the <i>func</i>. 
+The length of the list is same as the number of files processed. 
+Creates <i>dest</i> directory tree before calling <i>func</i> unless <i>dest</i> = <code>None</code>. 
+Skip files at top directory if <i>exclude_root_files</i> = <code>True</code>. 
+      </p>
+    </details>
+  </section>
+</main>
+
+<footer>
+  <span><a href="../index.html">../.. Reference</a></span>
+  <span><a href="./index.html">.. jsngram.dir2</a></span>
+  <span><a href="https://github.com/sukuba/js-py-ngram-full-text-search" target="_blank">sources are available at github. </a></span>
+</footer>
+</body>
+</html>

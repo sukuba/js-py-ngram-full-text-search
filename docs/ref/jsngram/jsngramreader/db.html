@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>JsNgramReader.db js-py-ngram-full-text-search</title>
+  <link rel="stylesheet" href="../../../thema.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body>
+
+<div id="head">
+  <header>
+    <h1>js-py-ngram-full-text-search</h1>
+    <h2>JsNgramReader.db</h2>
+  </header>
+  
+  <nav>
+    <span><a href="../../index.html">../.. Reference</a></span>
+    <span><a href="../index.html">.. jsngram.jsngram</a></span>
+    <span><a href="./index.html">. JsNgramReader class</a></span>
+  </nav>
+</div>
+
+<main>
+  <section>
+    <h3>property of class JsNgramReader</h3>
+    <details>
+      <summary>Description</summary>
+      <p>
+Store indexes from json files as the same structure as <code><a href="../jsngram/db.html">JsNgram.db</a></code>. 
+      </p>
+    </details>
+    <details>
+      <summary>Example</summary>
+      <pre>
+# This is meant to compare to the original in a test. 
+# where ix is the original, and src is a json directory: 
+chk = jsngram.jsngram.JsNgramReader(src)
+chk.read_files(True)
+res = 'OK' if chk.db == ix.db else 'NG'
+      </pre>
+    </details>
+    <details>
+      <summary>Usage</summary>
+      <pre>
+Data structure is as followings: 
+{
+  index-key: [
+    [doc-path, start-position],
+    [doc-path, start-position]
+  ], 
+  index-key: [
+    [doc-path, start-position]
+  ] 
+}
+      </pre>
+    </details>
+  </section>
+</main>
+
+<footer>
+  <span><a href="../../index.html">../.. Reference</a></span>
+  <span><a href="../index.html">.. jsngram.jsngram</a></span>
+  <span><a href="./index.html">. JsNgramReader class</a></span>
+  <span><a href="https://github.com/sukuba/js-py-ngram-full-text-search" target="_blank">sources are available at github. </a></span>
+</footer>
+</body>
+</html>
