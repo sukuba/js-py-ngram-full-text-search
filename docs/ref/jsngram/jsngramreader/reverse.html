@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>JsNgramReader.src js-py-ngram-full-text-search</title>
+  <title>JsNgramReader.reverse js-py-ngram-full-text-search</title>
   <link rel="stylesheet" href="../../../thema.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 </head>
@@ -11,7 +11,7 @@
 <div id="head">
   <header>
     <h1>js-py-ngram-full-text-search</h1>
-    <h2>JsNgramReader.src</h2>
+    <h2>JsNgramReader.reverse</h2>
   </header>
   
   <nav>
@@ -23,36 +23,29 @@
 
 <main>
   <section>
-    <h3>property of class JsNgramReader</h3>
+    <h3>method of class JsNgramReader</h3>
     <details>
       <summary>Description</summary>
       <p>
-Set the json file directory to read. 
+Reverse index data to decode original text for debug. 
+Result is put in the property <code><a href="work.html">work</a></code>. 
       </p>
     </details>
     <details>
       <summary>Example</summary>
       <pre>
-self.src = '/scratch/a/pub/idx'
-      </pre>
-    </details>
-    <details>
-      <summary>Default value</summary>
-      <pre>
-'.'
+self.reverse(['a/b.txt', 'a/c.txt'], True)
       </pre>
     </details>
     <details>
       <summary>Usage</summary>
-      <pre>
-import jsngram.jsngram
-
-# gives at class initializing
-chk = jsngram.jsngram.JsNgramReader(src='/scratch/a/pub/idx')
-
-# sets property value later
-chk.src = '/scratch/b/pub/idx'
-      </pre>
+      <p>
+reverse(<i>paths</i>, <i>verbose</i>)
+      </p>
+      <p>
+Argument <i>paths</i> is a list of path (document id) to extract data reversed from index. 
+Prints debugging informations if <i>verbose</i> = <code>True</code>. 
+      </p>
     </details>
   </section>
 </main>
