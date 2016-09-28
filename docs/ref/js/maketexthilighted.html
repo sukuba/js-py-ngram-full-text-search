@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>JsNgram.makeTextHilighted js-py-ngram-full-text-search</title>
+  <link rel="stylesheet" href="../../thema.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body>
+
+<div id="head">
+  <header>
+    <h1>js-py-ngram-full-text-search</h1>
+    <h2>JsNgram.makeTextHilighted</h2>
+  </header>
+  
+  <nav>
+    <span><a href="../index.html">.. Reference</a></span>
+    <span><a href="./index.html">. JsNgram static class</a></span>
+  </nav>
+</div>
+
+<main>
+  <section>
+    <h3>method of static class JsNgram</h3>
+    <details>
+      <summary>Description</summary>
+      <p>
+Generate html with text hilighted. 
+      </p>
+    </details>
+    <details>
+      <summary>Example</summary>
+      <pre>
+JsNgram.makeTextHilighted('The cat is found', 4, 3, 10);
+// 'he &lt;b&gt;cat&lt;/b&gt; is '
+      </pre>
+    </details>
+    <details>
+      <summary>Usage</summary>
+      <p>
+makeTextHilighted(<i>text</i>, <i>at</i>, <i>hiLen</i>, <i>outLen</i>);
+      </p>
+      <p>
+Argument <i>text</i> is a full text string. 
+Argument <i>at</i> is a beginning position of the keyword that is to be hilighted. 
+Argument <i>hiLen</i> is a hilight length. 
+Argument <i>outLen</i> is a text length for output. 
+      </p>
+      <p>
+The hilight characters are done with html <code>b</code> tag. 
+Output text is html escaped. 
+Text is cut with ignoring word breaks. 
+      </p>
+    </details>
+  </section>
+</main>
+
+<footer>
+  <span><a href="../index.html">.. Reference</a></span>
+  <span><a href="./index.html">. JsNgram static class</a></span>
+  <span><a href="https://github.com/sukuba/js-py-ngram-full-text-search" target="_blank">sources are available at github. </a></span>
+</footer>
+</body>
+</html>

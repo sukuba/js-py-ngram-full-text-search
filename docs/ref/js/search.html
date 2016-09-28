@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>JsNgram.search js-py-ngram-full-text-search</title>
+  <link rel="stylesheet" href="../../thema.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body>
+
+<div id="head">
+  <header>
+    <h1>js-py-ngram-full-text-search</h1>
+    <h2>JsNgram.search</h2>
+  </header>
+  
+  <nav>
+    <span><a href="../index.html">.. Reference</a></span>
+    <span><a href="./index.html">. JsNgram static class</a></span>
+  </nav>
+</div>
+
+<main>
+  <section>
+    <h3>method of static class JsNgram</h3>
+    <details>
+      <summary>Description</summary>
+      <p>
+Perform search on text and insert results in html. 
+This shouldl be called when a search button is pushed. 
+It is the only one method that user script calls usually.  
+      </p>
+    </details>
+    <details>
+      <summary>Example</summary>
+      <pre>
+JsNgram.search('cat');
+
+// register as a jQuery click event
+$('#search').click(function(){
+  JsNgram.search($('#q').val());
+});
+      </pre>
+    </details>
+    <details>
+      <summary>Usage</summary>
+      <p>
+search(<i>text</i>);
+      </p>
+      <p>
+Argument <i>text</i> is a string to search. 
+      </p>
+    </details>
+  </section>
+</main>
+
+<footer>
+  <span><a href="../index.html">.. Reference</a></span>
+  <span><a href="./index.html">. JsNgram static class</a></span>
+  <span><a href="https://github.com/sukuba/js-py-ngram-full-text-search" target="_blank">sources are available at github. </a></span>
+</footer>
+</body>
+</html>

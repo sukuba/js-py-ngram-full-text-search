@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>JsNgram.makeResultHtml js-py-ngram-full-text-search</title>
+  <link rel="stylesheet" href="../../thema.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body>
+
+<div id="head">
+  <header>
+    <h1>js-py-ngram-full-text-search</h1>
+    <h2>JsNgram.makeResultHtml</h2>
+  </header>
+  
+  <nav>
+    <span><a href="../index.html">.. Reference</a></span>
+    <span><a href="./index.html">. JsNgram static class</a></span>
+  </nav>
+</div>
+
+<main>
+  <section>
+    <h3>method of static class JsNgram</h3>
+    <details>
+      <summary>Description</summary>
+      <p>
+Generate html for result. 
+It has sub functions:
+      </p>
+      <dl>
+        <dt>
+header
+        </dt>
+        <dd>
+generate table headers.
+        </dd>
+        <dt>
+content
+        </dt>
+        <dd>
+generate table contents of hit.
+        </dd>
+        <dt>
+title
+        </dt>
+        <dd>
+generate table contents of doc info.
+        </dd>
+        <dt>
+docbox
+        </dt>
+        <dd>
+generate table contents of doc.
+        </dd>
+      </dl>
+    </details>
+    <details>
+      <summary>Example</summary>
+      <pre>
+selector.append(JsNgram.makeResultHtml.header());
+selector.append(JsNgram.makeResultHtml.content([x, pos+1]));
+selector.append(JsNgram.makeResultHtml.title(url, title, []));
+selector.append(JsNgram.makeResultHtml.docbox());
+      </pre>
+    </details>
+    <details>
+      <summary>Usage</summary>
+      <p>
+makeResultHtml.header(<i>data</i>); <br />
+makeResultHtml.content(<i>data</i>); <br />
+makeResultHtml.title(<i>url</i>, <i>title</i>, <i>data</i>); <br />
+makeResultHtml.docbox();
+      </p>
+      <p>
+Argument <i>data</i> is an array of content each of that is put in <code>span</code> element. 
+Argument <i>url</i> is a url for hyperlink. 
+Argument <i>title</i> is used for the face text of hyperlink. 
+      </p>
+      <p>
+Override this method to customize the look of result. 
+      </p>
+    </details>
+  </section>
+</main>
+
+<footer>
+  <span><a href="../index.html">.. Reference</a></span>
+  <span><a href="./index.html">. JsNgram static class</a></span>
+  <span><a href="https://github.com/sukuba/js-py-ngram-full-text-search" target="_blank">sources are available at github. </a></span>
+</footer>
+</body>
+</html>

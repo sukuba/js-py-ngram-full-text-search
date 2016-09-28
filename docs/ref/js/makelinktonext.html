@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>JsNgram.makeLinkToNext js-py-ngram-full-text-search</title>
+  <link rel="stylesheet" href="../../thema.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body>
+
+<div id="head">
+  <header>
+    <h1>js-py-ngram-full-text-search</h1>
+    <h2>JsNgram.makeLinkToNext</h2>
+  </header>
+  
+  <nav>
+    <span><a href="../index.html">.. Reference</a></span>
+    <span><a href="./index.html">. JsNgram static class</a></span>
+  </nav>
+</div>
+
+<main>
+  <section>
+    <h3>method of static class JsNgram</h3>
+    <details>
+      <summary>Description</summary>
+      <p>
+Generate html button to control pages for result. 
+      </p>
+    </details>
+    <details>
+      <summary>Example</summary>
+      <pre>
+selector.append(JsNgram.makeLinkToNext(true, selector, false, 200, 100));
+      </pre>
+    </details>
+    <details>
+      <summary>Usage</summary>
+      <p>
+makeLinkToNext(<i>isPerfection</i>, <i>selector</i>, <i>doc</i>, <i>start</i>, <i>limit</i>);
+      </p>
+      <p>
+Argument <i>isPerfection</i> is a boolean value whether the button is for perfect matches or partial matches. 
+Argument <i>selector</i> is a html element to place the next results. 
+Argument <i>doc</i> is a boolean value whether the button is for next hits in a document, or next documents. 
+Argument <i>start</i> is a number of items already shown. 
+Argument <i>limit</i> is a number of items to show when the button pressed. 
+A html <code>div</code> element of class <code>ui</code> icluding a <code>button</code> element with a click event showing next results is created. 
+      </p>
+    </details>
+  </section>
+</main>
+
+<footer>
+  <span><a href="../index.html">.. Reference</a></span>
+  <span><a href="./index.html">. JsNgram static class</a></span>
+  <span><a href="https://github.com/sukuba/js-py-ngram-full-text-search" target="_blank">sources are available at github. </a></span>
+</footer>
+</body>
+</html>
