@@ -26,7 +26,7 @@
     <details>
       <summary>Description</summary>
       <p>
-Custom log function with verbosity. 
+Custom log function with verbose level. 
       </p>
     </details>
     <details>
@@ -38,26 +38,31 @@ JsNgram.log.v1('level 1 debugging message: ', x);
     <details>
       <summary>Usage</summary>
       <p>
-log.v0(<i>obj1</i>, <i>obj2</i>,,, )
-log.v1(<i>obj1</i>, <i>obj2</i>,,, )
-log.v2(<i>obj1</i>, <i>obj2</i>,,, )
-log.v3(<i>obj1</i>, <i>obj2</i>,,, )
+log.v0(<i>obj1</i>[, <i>obj2</i>, ... ]); <br />
+log.v1(<i>obj1</i>[, <i>obj2</i>, ... ]); <br />
+log.v2(<i>obj1</i>[, <i>obj2</i>, ... ]); <br />
+log.v3(<i>obj1</i>[, <i>obj2</i>, ... ]); <br />
       </p>
       <p>
-When verbosity = 1, log.v0 and log.v1 act as console.log, and log.v2 and log.v3 do nothing. 
-The log.v0 is as same as console.log. 
+When <code><a href="verbose.html">verbose</a> = 1</code>, <code>log.v0</code> and <code>log.v1</code> act as <code>console.log</code>. 
+On the other hand <code>log.v2</code> and <code>log.v3</code> do nothing. 
+The <code>log.v0</code> is always as same as <code>console.log</code>. 
       </p>
     </details>
     <details>
       <summary>Inner Class Log</summary>
       <p>
-
+The <code>log</code> method is an instance of inner class <code>Log</code>. 
+It has methods <code>v0</code>, <code>v1</code>, <code>v2</code> and <code>v3</code>. 
+The class is initialized with verbose level. 
+And the instance will have fixed rolls on these four methods. 
       </p>
     </details>
     <details>
-      <summary>When verbosity changed</summary>
+      <summary>When property <code>verbose</code> changed</summary>
       <p>
-
+A new instance of the inner class <code>Log</code> is generated with the new verbose level. 
+This new instance is set as the method <code>log</code>. 
       </p>
     </details>
   </section>

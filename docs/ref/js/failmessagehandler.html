@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>JsNgram.failMessageHandler js-py-ngram-full-text-search</title>
+  <link rel="stylesheet" href="../../thema.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body>
+
+<div id="head">
+  <header>
+    <h1>js-py-ngram-full-text-search</h1>
+    <h2>JsNgram.failMessageHandler</h2>
+  </header>
+  
+  <nav>
+    <span><a href="../index.html">.. Reference</a></span>
+    <span><a href="./index.html">. JsNgram static class</a></span>
+  </nav>
+</div>
+
+<main>
+  <section>
+    <h3>method of static class JsNgram</h3>
+    <details>
+      <summary>Description</summary>
+      <p>
+Handle the failure of ajax and show error message. 
+      </p>
+    </details>
+    <details>
+      <summary>Example</summary>
+      <pre>
+$.ajax(JsNgram.indexFileName(text), JsNgram.ajaxJson).fail(JsNgram.failMessageHandler);
+      </pre>
+    </details>
+    <details>
+      <summary>Usage</summary>
+      <p>
+failMessageHandler(<i>xhr</i>, <i>ajaxOptions</i>, <i>thrownError</i>);
+      </p>
+      <p>
+Argument <i>xhr</i> is a jQuery jqXHR object. 
+Argument <i>ajaxOptions</i> is a PlainObject that contains options on ajax calling. 
+Argument <i>thrownError</i> is a string that shows the error. 
+      </p>
+      <p>
+It shows detailed messages on console. 
+Notifies end-user just result was 0, avoids showing them technical messages. 
+      </p>
+      <p>
+It is a jQuery ajax callback function for <code>deferred.fail</code>, 
+read the <a href="http://api.jquery.com/category/deferred-object/" target="_blank">jQeury document</a> for details. 
+      </p>
+    </details>
+  </section>
+</main>
+
+<footer>
+  <span><a href="../index.html">.. Reference</a></span>
+  <span><a href="./index.html">. JsNgram static class</a></span>
+  <span><a href="https://github.com/sukuba/js-py-ngram-full-text-search" target="_blank">sources are available at github. </a></span>
+</footer>
+</body>
+</html>

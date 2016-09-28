@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>JsNgram.generateDeferred js-py-ngram-full-text-search</title>
+  <link rel="stylesheet" href="../../thema.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body>
+
+<div id="head">
+  <header>
+    <h1>js-py-ngram-full-text-search</h1>
+    <h2>JsNgram.generateDeferred</h2>
+  </header>
+  
+  <nav>
+    <span><a href="../index.html">.. Reference</a></span>
+    <span><a href="./index.html">. JsNgram static class</a></span>
+  </nav>
+</div>
+
+<main>
+  <section>
+    <h3>method of static class JsNgram</h3>
+    <details>
+      <summary>Description</summary>
+      <p>
+Generate ajax request array for each N-gram keyword after submit. 
+      </p>
+    </details>
+    <details>
+      <summary>Example</summary>
+      <pre>
+JsNgram.work['deferred'] = JsNgram.generateDeferred(JsNgram.work);
+// the last one submits multiple ajax requests.
+      </pre>
+    </details>
+    <details>
+      <summary>Usage</summary>
+      <p>
+generateDeferred(<i>work</i>);
+      </p>
+      <p>
+Argument <i>work</i> is the <code><a href="work.html">work</a></code> property. 
+      </p>
+      <p>
+Reads N-gram keywords from the property work. 
+      </p>
+      <p>
+It returns an array of jQuery deferred object 
+that should be completed before reporting. 
+Read the <a href="http://api.jquery.com/category/deferred-object/" target="_blank">jQeury document</a> for details. 
+      </p>
+    </details>
+  </section>
+</main>
+
+<footer>
+  <span><a href="../index.html">.. Reference</a></span>
+  <span><a href="./index.html">. JsNgram static class</a></span>
+  <span><a href="https://github.com/sukuba/js-py-ngram-full-text-search" target="_blank">sources are available at github. </a></span>
+</footer>
+</body>
+</html>
