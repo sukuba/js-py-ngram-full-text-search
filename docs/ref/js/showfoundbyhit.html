@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>JsNgram.makeLinkToNext js-py-ngram-full-text-search</title>
+  <title>JsNgram.showFoundByHit js-py-ngram-full-text-search</title>
   <link rel="stylesheet" href="../../thema.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 </head>
@@ -11,7 +11,7 @@
 <div id="head">
   <header>
     <h1>js-py-ngram-full-text-search</h1>
-    <h2>JsNgram.makeLinkToNext</h2>
+    <h2>JsNgram.showFoundByHit</h2>
   </header>
   
   <nav>
@@ -26,28 +26,34 @@
     <details>
       <summary>Description</summary>
       <p>
-Generate html button to control pages for result. 
+Show found result as a list of hits in a doument. 
+Both for perfect matches and partial matches. 
       </p>
     </details>
     <details>
       <summary>Example</summary>
       <pre>
-selector.append(JsNgram.makeLinkToNext(true, selector, null, 200, 100));
+JsNgram.showFoundByHit(perfection, selector, 'a/b.txt', 101, 100);
       </pre>
     </details>
     <details>
       <summary>Usage</summary>
       <p>
-makeLinkToNext(<i>isPerfection</i>, <i>selector</i>, <i>doc</i>, <i>start</i>, <i>limit</i>);
+showFoundByHit(<i>perfection</i>, <i>selector</i>, <i>doc</i>, <i>start</i>, <i>limit</i>);
       </p>
       <p>
-Argument <i>isPerfection</i> is a boolean value whether the button is for perfect matches or partial matches. 
-Argument <i>selector</i> is a html element to place the next results. 
-A button for next hits in a document is generated when argument <i>doc</i> is a document id. 
-A button for next documents is generated when argument <i>doc</i> is null. 
-Argument <i>start</i> is a number of items already shown. 
-Argument <i>limit</i> is a number of items to show when the button pressed. 
-A html <code>div</code> element of class <code>ui</code> icluding a <code>button</code> element with a click event showing next results is created. 
+Argument <i>perfection</i> is a matched data sorted by document. 
+Argument <i>selector</i> is a html element to place the result. 
+Argument <i>doc</i> is a document id. 
+Argument <i>start</i> is a number of items to skip. 
+Argument <i>limit</i> is a number of items to show at once. 
+      </p>
+      <p>
+This method is branched from the method <a href="showfound.html">showFound</a>. 
+      </p>
+      <p>
+Returns a hash object with a key <code>deferred</code> with value as an array of jQuery deferred object. 
+It also has a key <code>next</code> when there are records not shown yet. 
       </p>
     </details>
   </section>
