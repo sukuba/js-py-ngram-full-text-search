@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>JsNgram.showFound js-py-ngram-full-text-search</title>
+  <title>JsNgram.showPage js-py-ngram-full-text-search</title>
   <link rel="stylesheet" href="../../thema.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 </head>
@@ -11,7 +11,7 @@
 <div id="head">
   <header>
     <h1>js-py-ngram-full-text-search</h1>
-    <h2>JsNgram.showFound</h2>
+    <h2>JsNgram.showPage</h2>
   </header>
   
   <nav>
@@ -26,20 +26,20 @@
     <details>
       <summary>Description</summary>
       <p>
-Show found result. 
-Both for perfect matches and partial matches. 
+Wrapper of the method <i><a href="showfound.html">showFound</a></i> to enable page control. 
       </p>
     </details>
     <details>
       <summary>Example</summary>
       <pre>
-JsNgram.showFound(true, selector, 'a/b.txt', 1, 100);
+JsNgram.showPage(true, selector, 'a/b.txt', 1, 100);
+JsNgram.showPage(true, JsNgram.resultSelector, null, 0, JsNgram.outputLimiter);
       </pre>
     </details>
     <details>
       <summary>Usage</summary>
       <p>
-showFound(<i>isPerfection</i>, <i>selector</i>, <i>doc</i>, <i>start</i>, <i>limit</i>);
+showPage(<i>isPerfection</i>, <i>selector</i>, <i>doc</i>, <i>start</i>, <i>limit</i>);
       </p>
       <p>
 Argument <i>isPerfection</i> is a boolean value whether it is for perfect matches or partial matches. 
@@ -50,12 +50,9 @@ Argument <i>start</i> is a number of items to skip.
 Argument <i>limit</i> is a number of items to show at once. 
       </p>
       <p>
-This method is just a branching point of two methods <a href="showfoundbyhit.html">showFoundByHit</a> and <a href="showfoundbydoc.html">showFoundByDoc</a>. 
-They are to show hits inside a document and to show documents, respectively. 
-      </p>
-      <p>
-Returns a hash object with a key <code>deferred</code> with value as an array of jQuery deferred object. 
-It also has a key <code>next</code> when there are records not shown yet. 
+This method is an entry point of call. 
+It is called at first after getting the result, 
+and also called by pushing the more button. 
       </p>
     </details>
   </section>
