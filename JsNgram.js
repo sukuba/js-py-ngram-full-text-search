@@ -924,7 +924,7 @@ var JsNgram = new function(){
   function appendSearchResult(what) {
     _my.work = _my.startWork(what);
     // wait until all ajax requests done.
-    $.when.apply($, _my.work.deferred).done(whenSearchRequestDone);
+    $.when.apply($, _my.work.deferred).done(_my.whenSearchRequestDone);
   }
   _my.appendSearchResult = appendSearchResult;
   
