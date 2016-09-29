@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>JsNgram.findPerfection js-py-ngram-full-text-search</title>
+  <title>JsNgram.sortFoundByDocumentPosition js-py-ngram-full-text-search</title>
   <link rel="stylesheet" href="../../thema.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 </head>
@@ -11,7 +11,7 @@
 <div id="head">
   <header>
     <h1>js-py-ngram-full-text-search</h1>
-    <h2>JsNgram.findPerfection</h2>
+    <h2>JsNgram.sortFoundByDocumentPosition</h2>
   </header>
   
   <nav>
@@ -26,34 +26,24 @@
     <details>
       <summary>Description</summary>
       <p>
-Pick up perfect match from sorted result of N-gram partial matches. 
-Returns the perfect match. 
-Count the number of hits and put it in the property <code><a href="work.html">work</a></code> as an array of <code>[hits, documents]</code>. 
+Rebuild and sort the result of partial matches by document and position for reporting. 
       </p>
     </details>
     <details>
       <summary>Example</summary>
       <pre>
-var found = JsNgram.sortResultsByLocation(results);
-JsNgram.findPerfection(found, 3);
+JsNgram.sortFoundByDocumentPosition(found);
       </pre>
     </details>
     <details>
       <summary>Usage</summary>
       <p>
-findPerfection(<i>x</i>, <i>n</i>);
+sortFoundByDocumentPosition(<i>found</i>);
       </p>
       <p>
-Argument <i>x</i> is a sorted result of match (by document). 
+Argument <i>found</i> is a result data used for N-gram matching. 
 The data should be the output of the method <code><a href="sortresultbylocation.html">sortResultByLocation</a></code>. 
-Argument <i>n</i> is the required count for perfect match. 
-This should be the number of generated N-gram keys. 
-For example, 2 for "cat" and 4 for "alice". 
-The output is compatible format with the method <code><a href="sortfoundbydocumentposition.html">sortFoundByDocumentPosition</a></code>. 
-      </p>
-      <p>
-This very method does match the N-gram results 
-comparing the N-gram key numbers with positons. 
+The output is compatible format with the method <code><a href="findperfection.html">findPerfection</a></code>. 
       </p>
       <p>
 The input <i>found</i> format is: 

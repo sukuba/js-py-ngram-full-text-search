@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>JsNgram.findPerfection js-py-ngram-full-text-search</title>
+  <title>JsNgram.sortResultsByLocation js-py-ngram-full-text-search</title>
   <link rel="stylesheet" href="../../thema.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 </head>
@@ -11,7 +11,7 @@
 <div id="head">
   <header>
     <h1>js-py-ngram-full-text-search</h1>
-    <h2>JsNgram.findPerfection</h2>
+    <h2>JsNgram.sortResultsByLocation</h2>
   </header>
   
   <nav>
@@ -26,37 +26,29 @@
     <details>
       <summary>Description</summary>
       <p>
-Pick up perfect match from sorted result of N-gram partial matches. 
-Returns the perfect match. 
+Rebuild an array of raw results of json indexes loaded. 
+Sort by document and N-gram key preparing for matching. 
 Count the number of hits and put it in the property <code><a href="work.html">work</a></code> as an array of <code>[hits, documents]</code>. 
       </p>
     </details>
     <details>
       <summary>Example</summary>
       <pre>
-var found = JsNgram.sortResultsByLocation(results);
-JsNgram.findPerfection(found, 3);
+JsNgram.sortResultsByLocation(results);
       </pre>
     </details>
     <details>
       <summary>Usage</summary>
       <p>
-findPerfection(<i>x</i>, <i>n</i>);
+sortResultsByLocation(<i>results</i>);
       </p>
       <p>
-Argument <i>x</i> is a sorted result of match (by document). 
-The data should be the output of the method <code><a href="sortresultbylocation.html">sortResultByLocation</a></code>. 
-Argument <i>n</i> is the required count for perfect match. 
-This should be the number of generated N-gram keys. 
-For example, 2 for "cat" and 4 for "alice". 
-The output is compatible format with the method <code><a href="sortfoundbydocumentposition.html">sortFoundByDocumentPosition</a></code>. 
+Argument <i>results</i> is an array of json indexes. 
+The sequence must be by the N-gram key number. 
+The output format is for the method <code><a href="findperfection.html">findPerfection</a></code> and <code><a href="sortfoundbydocumentposition.html">sortFoundByDocumentPosition</a></code>. 
       </p>
       <p>
-This very method does match the N-gram results 
-comparing the N-gram key numbers with positons. 
-      </p>
-      <p>
-The input <i>found</i> format is: 
+The output format is: 
       </p>
       <pre>
 {
@@ -78,22 +70,6 @@ following four N-gram keys are generated:
 "al", "li", "ic" and "ce" with the N-gram key number is 
 0, 1, 2 and 3, respectively. 
       </p>
-      <p>
-The output format is: 
-      </p>
-      <pre>
-{
-  document id: [ # list is sorted
-    [position, matched N-gram key text],
-    [position, matched N-gram key text],
-    [position, matched N-gram key text]
-  ], 
-  document id: [ # list is sorted
-    [position, matched N-gram key text],
-    [position, matched N-gram key text]
-  ]
-}
-      </pre>
     </details>
   </section>
 </main>
